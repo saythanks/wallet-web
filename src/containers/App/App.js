@@ -5,6 +5,7 @@ import { BrowserRouter, withRouter } from 'react-router-dom'
 import { getPersistor } from '@rematch/persist'
 import { PersistGate } from 'redux-persist/lib/integration/react'
 import { Switch, Route } from 'react-router'
+import { StripeProvider } from 'react-stripe-elements'
 
 import store from '../../store'
 import Home from '../Home/Home'
@@ -12,6 +13,7 @@ import Auth from '../Auth/Auth'
 import PublicRoute from '../util/PublicRoute'
 import PrivateRoute from '../util/PrivateRoute'
 import Embed from '../Embed/Embed'
+import config from '../../config'
 
 const Meat = ({ listen }) => {
   useEffect(() => listen(), [])
@@ -46,13 +48,15 @@ const persistor = getPersistor()
 const App = () => {
   return (
     <div className="min-h-full bg-grey-lightest">
-      <PersistGate persistor={persistor}>
-        <Provider store={store}>
-          <BrowserRouter>
-            <ConnectedMeat />
-          </BrowserRouter>
-        </Provider>
-      </PersistGate>
+      <StripeProvider apiKey={config.stripe.apiKey}>
+        <PersistGate persistor={persistor}>
+          <Provider store={store}>
+            <BrowserRouter>
+              <ConnectedMeat />
+            </BrowserRouter>
+          </Provider>
+        </PersistGate>
+      </StripeProvider>
     </div>
   )
 }

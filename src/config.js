@@ -5,4 +5,7 @@ export default {
     APP_CLIENT_ID: '7o7r9p6u3vcjsr1apk06blch3f',
     IDENTITY_POOL_ID: 'YOUR_IDENTITY_POOL_ID',
   },
+  stripe: {
+    apiKey: 'pk_test_Aa9HCt6t96ix37gxvpeqOKYL',
+  },
 }

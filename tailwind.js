@@ -191,6 +191,7 @@ module.exports = {
 
   fonts: {
     sans: [
+      'brandon-grotesque',
       'Brandon Grotesque',
       'system-ui',
       'BlinkMacSystemFont',

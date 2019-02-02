@@ -1,9 +1,10 @@
-import React, { useState } from 'react'
+import React, { useState, Fragment } from 'react'
 import faker from 'faker'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { ReactComponent as Logo } from './LogoB.svg'
 import moment from 'moment'
+import { CardElement, Elements, injectStripe } from 'react-stripe-elements'
 
 let content = []
 for (let i = 0; i < 5; i++) {
@@ -24,41 +25,104 @@ for (let i = 0; i < 5; i++) {
   })
 }
 
-const TopUpForm = () => {
+const TopUpForm = injectStripe((props, context) => {
   const options = [5, 10, 15, 20]
   const [selected, setSelected] = useState(0)
 
-  const handleSubimt = e => {
+  const [step, setStep] = useState(0)
+  const [loading, setLoading] = useState(false)
+
+  const handleSubmit = e => {
     e.preventDefault()
+    if (step !== 1) return
+
+    setLoading(true)
+
+    // Within the context of `Elements`, this call to createToken knows which Element to
+    // tokenize, since there's only one in this group.
+    props.stripe.createToken().then(({ token }) => {
+      console.log('Received Stripe token:', token)
+    })
+
+    setTimeout(() => setLoading(false), 1500)
+
+    // However, this line of code will do the same thing:
+    //
+    // this.props.stripe.createToken({type: 'card', name: 'Jenny Rosen'});
+
+    // You can also use createSource to create Sources. See our Sources
+    // documentation for more: https://stripe.com/docs/stripe-js/reference#stripe-create-source
+    //
+    // this.props.stripe.createSource({type: 'card', owner: {
+    //   name: 'Jenny Rosen'
+    // }});
   }
 
   return (
-    <form onSubmit={handleSubimt}>
-      <div className="flex -m-2 justify-between">
-        {options.map((amt, i) => (
+    <form onSubmit={handleSubmit}>
+      {step === 0 ? (
+        <div className="flex -m-2 justify-between">
+          {options.map((amt, i) => (
+            <button
+              type="button"
+              className={
+                'flex-1 bg-grey-lightest p-2 border text-grey-darker border-white rounded-sm m-2 flex items-start justify-center focus:outline-none ' +
+                (selected === i &&
+                  'border-pink-lighter bg-pink-lightest text-pink-dark')
+              }
+              onClick={() => setSelected(i)}
+            >
+              <span className="opacity-75 mt-px">$</span>
+              <span className="text-xl">{amt}</span>
+            </button>
+          ))}
           <button
-            className={
-              'flex-1 bg-grey-lightest p-2 border text-grey-darker border-white rounded-sm m-2 flex items-start justify-center focus:outline-none ' +
-              (selected === i &&
-                'border-pink-lighter bg-pink-lightest text-pink-dark')
-            }
-            onClick={() => setSelected(i)}
+            type="button"
+            onClick={() => setStep(1)}
+            className="px-4 flex items-baseline flex-no-shrink bg-pink-lightest rounded-sm text-pink-dark uppercase font-bold text-sm tracking-wide m-2 focus:outline-none"
           >
-            <span className="opacity-75 mt-px">$</span>
-            <span className="text-xl">{amt}</span>
+            <i className="fas fa-plus mr-2 text-pink-light" />
+            Add Cash
           </button>
-        ))}
-        <button
-          type="submit"
-          className="px-4 flex items-baseline flex-no-shrink bg-pink-lightest rounded-sm text-pink-dark uppercase font-bold text-sm tracking-wide m-2 focus:outline-none"
-        >
-          <i className="fas fa-plus mr-2 text-pink-light" />
-          Add Money
-        </button>
-      </div>
+        </div>
+      ) : (
+        <div className="text-left text-sm uppercase text-grey-dark tracking-wide font-bold">
+          <button
+            type="button"
+            className="text-grey-darker mb-2 focus:outline-none"
+            onClick={() => setStep(0)}
+          >
+            <i className="fas fa-arrow-left text-grey-light mr-1" /> Back
+          </button>
+          <div className="flex items-center justify-between">
+            <CardElement
+              className="flex-1"
+              style={{
+                base: { fontSize: '14px', fontFamily: 'Brandon Grotesque' },
+              }}
+            />
+            <button
+              type="submit"
+              className="bg-pink-lightest text-pink-dark font-bold uppercase tracking-wide focus:outline-none text-xs ml-4 px-4 py-2 rounded-sm"
+            >
+              {' '}
+              {loading ? (
+                <div>
+                  <i className="fas fa-spinner fa-spin" />
+                </div>
+              ) : (
+                <Fragment>
+                  <i className="fas fa-coins text-pink-lighter mr-1" /> Add $
+                  {options[selected]}
+                </Fragment>
+              )}
+            </button>
+          </div>
+        </div>
+      )}
     </form>
   )
-}
+})
 
 const Header = ({ logout, children }) => (
   <section className="pt-0 text-center bg-white border-b border-grey-lighter">
@@ -73,7 +137,9 @@ const Header = ({ logout, children }) => (
         transform: 'translateY(50%)',
       }}
     >
-      <TopUpForm />
+      <Elements>
+        <TopUpForm />
+      </Elements>
     </div>
   </section>
 )
@@ -155,7 +221,7 @@ const Balance = () => (
 const Item = ({ item }) => (
   <div className="flex rounded-sm mb-4 relative">
     <div
-      className="absolute border-2 border-white bg-pink rounded-full pin-t pin-l"
+      className="absolute border-2 border-pink-lightest bg-pink rounded-full pin-t pin-l"
       style={{ width: '10px', height: '10px', transform: 'translateX(-30%)' }}
     />
     {/* <div
@@ -166,11 +232,14 @@ const Item = ({ item }) => (
       <p className="text-grey mb-4 text-xs font-bold uppercase tracking-wide">
         {moment(item.date).fromNow()}
       </p>
-      <p className="mb-8 text-grey-darkest leading-normal text-xl">
+      <p className="mb-8 text-grey-darkest leading-loose text-xl">
         Bought{' '}
-        <span className="font-pink border-b border-pink text-pink-dark">
+        <a
+          href="#permalink"
+          className="no-underline font-pink border-b-2 border-pink-lighter text-pink-dark"
+        >
           {item.title}
-        </span>{' '}
+        </a>{' '}
         from <span className="font-semibold">{item.source}</span> for{' '}
         <span className="font-bold">${item.price}</span>
       </p>
@@ -179,7 +248,7 @@ const Item = ({ item }) => (
 )
 
 const Purchases = () => (
-  <section className=" max-w-sm mx-auto relative mt-20 mb-10">
+  <section className=" max-w-sm mx-auto relative mt-24 mb-10">
     <div className="timeline absolute pin-l w-1 h-full bg-grey-light rounded-sm" />
     {/* <pre>{JSON.stringify(content, null, 2, 2)}</pre> */}
     <div className="">

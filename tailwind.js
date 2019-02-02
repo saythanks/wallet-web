@@ -45,14 +45,14 @@ let defaultConfig = require('tailwindcss/defaultConfig')()
 let colors = {
   transparent: 'transparent',
 
-  black: '#22292f',
-  'grey-darkest': '#3d4852',
-  'grey-darker': '#606f7b',
-  'grey-dark': '#8795a1',
-  grey: '#b8c2cc',
-  'grey-light': '#dae1e7',
-  'grey-lighter': '#f1f5f8',
-  'grey-lightest': '#f8fafc',
+  black: '#1F2933',
+  'grey-darkest': '#3E4C59',
+  'grey-darker': '#52606D',
+  'grey-dark': '#616E7C',
+  grey: '#7B8794',
+  'grey-light': '#CBD2D9',
+  'grey-lighter': '#E4E7EB',
+  'grey-lightest': '#F5F7FA',
   white: '#ffffff',
 
   'red-darkest': '#3b0d0c',
@@ -119,13 +119,13 @@ let colors = {
   'purple-lighter': '#d6bbfc',
   'purple-lightest': '#f3ebff',
 
-  'pink-darkest': '#451225',
-  'pink-darker': '#6f213f',
-  'pink-dark': '#eb5286',
-  pink: '#f66d9b',
-  'pink-light': '#fa7ea8',
-  'pink-lighter': '#ffbbca',
-  'pink-lightest': '#ffebef',
+  'pink-darkest': '#620042',
+  'pink-darker': '#A30664',
+  'pink-dark': '#DA127D',
+  pink: '#E8368F',
+  'pink-light': '#F364A2',
+  'pink-lighter': '#FF8CBA',
+  'pink-lightest': '#FFE3EC',
 }
 
 module.exports = {
@@ -191,6 +191,7 @@ module.exports = {
 
   fonts: {
     sans: [
+      'Brandon Grotesque',
       'system-ui',
       'BlinkMacSystemFont',
       '-apple-system',

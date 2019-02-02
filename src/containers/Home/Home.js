@@ -1,20 +1,22 @@
-import React from 'react'
+import React, { useState } from 'react'
 import faker from 'faker'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { ReactComponent as Logo } from './Logo.svg'
+import { ReactComponent as Logo } from './LogoB.svg'
+import moment from 'moment'
 
 let content = []
 for (let i = 0; i < 5; i++) {
   content.push({
     id: faker.random.uuid(),
     source: faker.helpers.randomize([
-      'NY Times',
+      'The New York Times',
       'Medium',
-      'Washington Post',
+      'The Washington Post',
       'The Verge',
       'TechSlug',
     ]),
+    date: faker.date.past(0.01),
     title: faker.lorem.sentence(4, 3).replace('.', ''),
     preview: faker.lorem.sentences(3),
     image: faker.image.image(),
@@ -22,9 +24,57 @@ for (let i = 0; i < 5; i++) {
   })
 }
 
-const Header = () => (
-  <section className="py-12 text-center">
-    <Logo style={{ width: 200 }} />
+const TopUpForm = () => {
+  const options = [5, 10, 15, 20]
+  const [selected, setSelected] = useState(0)
+
+  const handleSubimt = e => {
+    e.preventDefault()
+  }
+
+  return (
+    <form onSubmit={handleSubimt}>
+      <div className="flex -m-2 justify-between">
+        {options.map((amt, i) => (
+          <button
+            className={
+              'flex-1 bg-grey-lightest p-2 border text-grey-darker border-white rounded-sm m-2 flex items-start justify-center focus:outline-none ' +
+              (selected === i &&
+                'border-pink-lighter bg-pink-lightest text-pink-dark')
+            }
+            onClick={() => setSelected(i)}
+          >
+            <span className="opacity-75 mt-px">$</span>
+            <span className="text-xl">{amt}</span>
+          </button>
+        ))}
+        <button
+          type="submit"
+          className="px-4 flex items-baseline flex-no-shrink bg-pink-lightest rounded-sm text-pink-dark uppercase font-bold text-sm tracking-wide m-2 focus:outline-none"
+        >
+          <i className="fas fa-plus mr-2 text-pink-light" />
+          Add Money
+        </button>
+      </div>
+    </form>
+  )
+}
+
+const Header = ({ logout, children }) => (
+  <section className="pt-0 text-center bg-white border-b border-grey-lighter">
+    <div className="w-full h-1 bg-pink p-0 block mb-6" />
+    <div className="container mx-auto">
+      <Nav logout={logout} />
+      <div className="max-w-sm mx-auto">{children}</div>
+    </div>
+    <div
+      className="border bg-white mx-auto max-w-md border-grey-lighter rounded p-6"
+      style={{
+        transform: 'translateY(50%)',
+      }}
+    >
+      <TopUpForm />
+    </div>
   </section>
 )
 
@@ -35,16 +85,22 @@ const Nav = ({ logout }) => {
   }
 
   const linkStyle =
-    'no-underline p-2 rounded-sm text-grey-dark hover:bg-grey-lighter'
+    'no-underline p-2 rounded-sm text-grey-dark hover:bg-grey-lightest'
   const mainStyle = `${linkStyle} font-semibold`
 
   const logoutStyle = `${linkStyle} font-normal`
 
   return (
     <section>
-      <nav className="flex justify-between align-baseline mb-12">
-        <div>
-          <Link to="/" className={mainStyle}>
+      <nav className="flex justify-between">
+        <div className="flex items-center">
+          <Link
+            to="/"
+            className={`${linkStyle} text-pink font-black flex items-center hover:bg-white`}
+          >
+            <Logo width={30} className="inline-block mr-4" /> SayThanks
+          </Link>
+          {/* <Link to="/" className={mainStyle}>
             Home
           </Link>
           <Link to="/" className={mainStyle}>
@@ -52,9 +108,12 @@ const Nav = ({ logout }) => {
           </Link>
           <Link to="/" className={mainStyle}>
             Settings
-          </Link>
+          </Link> */}
         </div>
-        <div>
+        <div className="flex items-center ">
+          <Link to="/" className={mainStyle}>
+            Settings
+          </Link>
           <a href="#logout" className={logoutStyle} onClick={handleLogout}>
             Sign out
           </a>
@@ -66,51 +125,64 @@ const Nav = ({ logout }) => {
 
 const MoneyKV = ({ title, amount, dim = false } = {}) => (
   <div className={'flex flex-col items-center ' + (dim && 'opacity-75')}>
+    <div className="flex">
+      <span
+        className={`text-2xl font-bold text-grey-dark mt-2 mr-1 ${!dim &&
+          'text-pink-light'}`}
+      >
+        $
+      </span>
+      <span
+        className={`text-5xl font-bold text-grey-darkest ${!dim &&
+          'text-pink'}`}
+      >
+        {amount}
+      </span>
+    </div>
     <p className="text-grey-dark uppercase tracking-wide font-bold text-sm mb-1">
       {title}
     </p>
-    <div className="flex">
-      <span className="text-2xl font-normal text-grey-dark mt-2 mr-1">$</span>
-      <span className="text-5xl  text-grey-darkest">{amount}</span>
-    </div>
   </div>
 )
 
 const Balance = () => (
-  <section className="shadow-lg w-full rounded p-8 bg-white flex justify-around">
+  <section className="w-full rounded pt-8 pb-4 flex justify-around">
     <MoneyKV title="Current Balance" amount={13.25} />
     <MoneyKV title="Monthly Spend" amount={1.25} dim />
   </section>
 )
 
 const Item = ({ item }) => (
-  <div className="flex rounded-sm mb-4 overflow-hidden">
+  <div className="flex rounded-sm mb-4 relative">
+    <div
+      className="absolute border-2 border-white bg-pink rounded-full pin-t pin-l"
+      style={{ width: '10px', height: '10px', transform: 'translateX(-30%)' }}
+    />
     {/* <div
       className="w-32 bg-cover bg-center"
       style={{ backgroundImage: `url("${item.image}")` }}
     /> */}
-    <div className="flex-1 p-4  pl-4">
-      <p className="text-sm">
-        Unlocked <span className="text-black font-bold">{item.title}</span> from{' '}
-        <span className="text-grey-dark font-semibold">{item.source}</span> for{' '}
-        <span className="text-grey-darkest font-bold">${item.price}</span>
+    <div className="flex-1  pl-4">
+      <p className="text-grey mb-4 text-xs font-bold uppercase tracking-wide">
+        {moment(item.date).fromNow()}
       </p>
-      {/* <p className="text-xs text-grey-dark font-semibold mb-1">{item.source}</p> */}
-      {/* <p className="text-base text-black font-bold">{item.title}</p> */}
-      {/* <p className="text-sm text-grey-darker my-1 leading-tight"> */}
-      {/* {<item className="pre"></item>view} */}
-      {/* </p> */}
+      <p className="mb-8 text-grey-darkest leading-normal text-xl">
+        Bought{' '}
+        <span className="font-pink border-b border-pink text-pink-dark">
+          {item.title}
+        </span>{' '}
+        from <span className="font-semibold">{item.source}</span> for{' '}
+        <span className="font-bold">${item.price}</span>
+      </p>
     </div>
   </div>
 )
 
 const Purchases = () => (
-  <section className="py-10">
-    <h1 className="text-grey-darkest text-xl pb-2 block ">
-      Recent Transactions
-    </h1>
+  <section className=" max-w-sm mx-auto relative mt-20 mb-10">
+    <div className="timeline absolute pin-l w-1 h-full bg-grey-light rounded-sm" />
     {/* <pre>{JSON.stringify(content, null, 2, 2)}</pre> */}
-    <div className="-m-y-4 bg-white rounded-sm shadow-md">
+    <div className="">
       {content.map(a => (
         <Item key={a.id} item={a} />
       ))}
@@ -119,17 +191,11 @@ const Purchases = () => (
 )
 
 const Home = ({ logout }) => (
-  <div className="container mx-auto sm:px-0 px-6">
-    <div className="max-w-sm mx-auto">
-      <Header />
-      <Nav logout={logout} />
-      <Balance />
-      <a
-        href="#a"
-        className="text-grey-darker font-bold text-sm mt-3 bg-grey-light active:bg-grey text-center block px-3 py-2 no-underline"
-      >
-        Add money
-      </a>
+  <div className="font-sans">
+    <div className="">
+      <Header logout={logout}>
+        <Balance />
+      </Header>
 
       <Purchases />
     </div>

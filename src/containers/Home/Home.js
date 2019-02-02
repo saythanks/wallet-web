@@ -95,12 +95,7 @@ const TopUpForm = injectStripe((props, context) => {
             <i className="fas fa-arrow-left text-grey-light mr-1" /> Back
           </button>
           <div className="flex items-center justify-between">
-            <CardElement
-              className="flex-1"
-              style={{
-                base: { fontSize: '14px', fontFamily: 'Brandon Grotesque' },
-              }}
-            />
+            <CardElement className="flex-1" />
             <button
               type="submit"
               className="bg-pink-lightest text-pink-dark font-bold uppercase tracking-wide focus:outline-none text-xs ml-4 px-4 py-2 rounded-sm"

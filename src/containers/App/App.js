@@ -16,6 +16,7 @@ import PublicRoute from '../util/PublicRoute'
 import PrivateRoute from '../util/PrivateRoute'
 import Embed from '../Embed/Embed'
 import config from '../../config'
+import Settings from '../Settings/Settings'
 
 const Meat = ({ listen }) => {
   useEffect(() => listen(), [])
@@ -26,6 +27,7 @@ const Meat = ({ listen }) => {
       <Switch>
         <Route path="/embed" exact component={Embed} />
         <PublicRoute path="/auth" component={Auth} />
+        <PrivateRoute path="/settings" component={Settings} />
         <PrivateRoute path="/" component={Home} />
       </Switch>
     </Fragment>

@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import { ReactComponent as Logo } from './LogoB.svg'
 import moment from 'moment'
 import { CardElement, Elements, injectStripe } from 'react-stripe-elements'
+import { toast } from 'react-toastify'
 
 let content = []
 for (let i = 0; i < 5; i++) {
@@ -31,6 +32,7 @@ const TopUpForm = injectStripe((props, context) => {
 
   const [step, setStep] = useState(0)
   const [loading, setLoading] = useState(false)
+  const [cardError, setCardError] = useState()
 
   const handleSubmit = e => {
     e.preventDefault()
@@ -44,7 +46,11 @@ const TopUpForm = injectStripe((props, context) => {
       console.log('Received Stripe token:', token)
     })
 
-    setTimeout(() => setLoading(false), 1500)
+    setTimeout(() => {
+      toast.success(`$${options[selected]} added to your account!`)
+      setStep(0)
+      setLoading(false)
+    }, 1500)
 
     // However, this line of code will do the same thing:
     //
@@ -64,6 +70,7 @@ const TopUpForm = injectStripe((props, context) => {
         <div className="flex -m-2 justify-between">
           {options.map((amt, i) => (
             <button
+              key={amt}
               type="button"
               className={
                 'flex-1 bg-grey-lightest p-2 border text-grey-darker border-white rounded-sm m-2 flex items-start justify-center focus:outline-none ' +
@@ -86,7 +93,7 @@ const TopUpForm = injectStripe((props, context) => {
           </button>
         </div>
       ) : (
-        <div className="text-left text-sm uppercase text-grey-dark tracking-wide font-bold">
+        <div className="text-left text-sm">
           <button
             type="button"
             className="text-grey-darker mb-2 focus:outline-none"
@@ -95,9 +102,16 @@ const TopUpForm = injectStripe((props, context) => {
             <i className="fas fa-arrow-left text-grey-light mr-1" /> Back
           </button>
           <div className="flex items-center justify-between">
-            <CardElement className="flex-1" />
+            <CardElement
+              className="flex-1"
+              onChange={({ error }) => {
+                if (error) setCardError(error.message)
+                else setCardError(null)
+              }}
+            />
             <button
               type="submit"
+              disabled={!!cardError}
               className="bg-pink-lightest text-pink-dark font-bold uppercase tracking-wide focus:outline-none text-xs ml-4 px-4 py-2 rounded-sm"
             >
               {' '}
@@ -113,6 +127,7 @@ const TopUpForm = injectStripe((props, context) => {
               )}
             </button>
           </div>
+          <p className="error text-xs text-red ">{cardError}</p>
         </div>
       )}
     </form>
@@ -219,10 +234,6 @@ const Item = ({ item }) => (
       className="absolute border-2 border-pink-lightest bg-pink rounded-full pin-t pin-l"
       style={{ width: '10px', height: '10px', transform: 'translateX(-30%)' }}
     />
-    {/* <div
-      className="w-32 bg-cover bg-center"
-      style={{ backgroundImage: `url("${item.image}")` }}
-    /> */}
     <div className="flex-1  pl-4">
       <p className="text-grey mb-4 text-xs font-bold uppercase tracking-wide">
         {moment(item.date).fromNow()}
@@ -243,15 +254,46 @@ const Item = ({ item }) => (
 )
 
 const Purchases = () => (
-  <section className=" max-w-sm mx-auto relative mt-24 mb-10">
-    <div className="timeline absolute pin-l w-1 h-full bg-grey-light rounded-sm" />
-    {/* <pre>{JSON.stringify(content, null, 2, 2)}</pre> */}
-    <div className="">
-      {content.map(a => (
-        <Item key={a.id} item={a} />
-      ))}
+  <section className=" max-w-sm mx-auto mt-24 mb-24">
+    <div className=" relative">
+      <div className="timeline absolute pin-l w-1 h-full bg-grey-light rounded-sm" />
+      <div className="">
+        {content.map(a => (
+          <Item key={a.id} item={a} />
+        ))}
+      </div>
+    </div>
+    <div className="text-center">
+      <button className="font-semibold text-grey-dark border-b border-grey-light focus:outline-none hover:text-grey-darker">
+        See all
+      </button>
     </div>
   </section>
+)
+
+const FooterLink = ({ to, children }) => (
+  <Link className="no-underline text-grey text-sm mx-4" to={to}>
+    {children}
+  </Link>
+)
+
+const Footer = () => (
+  <footer>
+    <section className="container mx-auto py-10 sm:px-0 px-6 flex flex-col items-center justify-center">
+      <Link
+        to="/"
+        className="block no-underline text-pink font-black flex items-center mb-4"
+      >
+        <Logo width={30} className="inline-block mr-4" /> SayThanks
+      </Link>
+      <div>
+        <FooterLink to="/">Terms of Use</FooterLink>
+        <FooterLink to="/">Privacy</FooterLink>
+        <FooterLink to="/">Help</FooterLink>
+        <FooterLink to="/">Contact</FooterLink>
+      </div>
+    </section>
+  </footer>
 )
 
 const Home = ({ logout }) => (
@@ -262,6 +304,7 @@ const Home = ({ logout }) => (
       </Header>
 
       <Purchases />
+      <Footer />
     </div>
   </div>
 )

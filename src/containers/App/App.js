@@ -6,6 +6,8 @@ import { getPersistor } from '@rematch/persist'
 import { PersistGate } from 'redux-persist/lib/integration/react'
 import { Switch, Route } from 'react-router'
 import { StripeProvider } from 'react-stripe-elements'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 import store from '../../store'
 import Home from '../Home/Home'
@@ -20,6 +22,7 @@ const Meat = ({ listen }) => {
 
   return (
     <Fragment>
+      <ToastContainer />
       <Switch>
         <Route path="/embed" exact component={Embed} />
         <PublicRoute path="/auth" component={Auth} />

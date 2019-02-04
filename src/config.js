@@ -9,6 +9,9 @@ export default {
     apiKey: 'pk_test_Aa9HCt6t96ix37gxvpeqOKYL',
   },
   api: {
-    baseUrl: process.env.API_BASE_URL || 'http://localhost:5000',
+    baseUrl:
+      process.env.NODE_ENV === 'production'
+        ? 'https://api.saythanks.me'
+        : process.env.API_BASE_URL,
   },
 }

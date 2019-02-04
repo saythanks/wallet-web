@@ -1,6 +1,8 @@
 import React, { Fragment, useState } from 'react'
 import { injectStripe, CardElement } from 'react-stripe-elements'
 import { toast } from 'react-toastify'
+import config from '../config'
+import axios from 'axios'
 
 const TopUpForm = injectStripe((props, context) => {
   const options = [5, 10, 15, 20]
@@ -20,13 +22,21 @@ const TopUpForm = injectStripe((props, context) => {
     // tokenize, since there's only one in this group.
     props.stripe.createToken().then(({ token }) => {
       console.log('Received Stripe token:', token)
-    })
 
-    setTimeout(() => {
-      toast.success(`$${options[selected]} added to your account!`)
-      setStep(0)
-      setLoading(false)
-    }, 1500)
+      axios
+        .post(`${config.api.baseUrl}/balance`, {
+          token: token.id,
+          amount: options[selected] * 100,
+        })
+        .then(() =>
+          toast.success(`$${options[selected]} added to your account!`)
+        )
+        .catch(e => toast.error(e.message))
+        .finally(() => {
+          setLoading(false)
+          setStep(0)
+        })
+    })
 
     // However, this line of code will do the same thing:
     //

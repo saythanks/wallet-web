@@ -1,6 +1,7 @@
 import React from 'react'
 import Header from '../../components/Header'
 import Button from '../../components/Button'
+import Footer from '../../components/Footer'
 
 const FormGroup = ({ children, title = '' } = {}) => (
   <label className="mb-6 block w-full">
@@ -68,6 +69,7 @@ const Settings = () => {
           </Section>
         </div>
       </div>
+      <Footer />
     </div>
   )
 }

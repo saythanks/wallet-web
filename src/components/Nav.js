@@ -26,7 +26,7 @@ const Nav = ({ logout }) => {
           </Link>
         </div>
         <div className="flex items-center ">
-          <Link to="/" className={mainStyle}>
+          <Link to="/settings" className={mainStyle}>
             Settings
           </Link>
           <a href="#logout" className={logoutStyle} onClick={handleLogout}>

@@ -12,6 +12,6 @@ export default {
     baseUrl:
       process.env.NODE_ENV === 'production'
         ? 'https://api.saythanks.me'
-        : process.env.API_BASE_URL,
+        : 'http://localhost:5000',
   },
 }

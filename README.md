@@ -1,3 +1,5 @@
+[![Netlify Status](https://api.netlify.com/api/v1/badges/b7201ed6-bd42-4999-b24e-ad92dfc8414a/deploy-status)](https://app.netlify.com/sites/flamboyant-kilby-b497dc/deploys)
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts

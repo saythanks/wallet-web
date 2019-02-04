@@ -8,4 +8,7 @@ export default {
   stripe: {
     apiKey: 'pk_test_Aa9HCt6t96ix37gxvpeqOKYL',
   },
+  api: {
+    baseUrl: process.env.API_BASE_URL || 'http://localhost:5000',
+  },
 }

@@ -1,12 +1,12 @@
-import React, { useState, Fragment } from 'react'
+import React, { useState, useEffect, Fragment } from 'react'
 import faker from 'faker'
 import { connect } from 'react-redux'
-import { Link } from 'react-router-dom'
-import { ReactComponent as Logo } from './LogoB.svg'
 import moment from 'moment'
-import { CardElement, Elements, injectStripe } from 'react-stripe-elements'
-import { toast } from 'react-toastify'
 import Header from '../../components/Header'
+import Footer from '../../components/Footer'
+import axios from 'axios'
+import { toast } from 'react-toastify'
+import config from '../../config'
 
 let content = []
 for (let i = 0; i < 5; i++) {
@@ -49,12 +49,39 @@ const MoneyKV = ({ title, amount, dim = false } = {}) => (
   </div>
 )
 
-const Balance = () => (
-  <section className="w-full rounded pt-8 pb-4 flex justify-around">
-    <MoneyKV title="Current Balance" amount={13.25} />
-    <MoneyKV title="Monthly Spend" amount={1.25} dim />
-  </section>
-)
+const Balance = () => {
+  const [loading, setLoading] = useState(true)
+  const [balances, setBalances] = useState()
+
+  const twoDecimals = num => parseFloat(Math.round(num * 100) / 100).toFixed(2)
+  useEffect(() => {
+    axios
+      .get(`${config.api.baseUrl}/balance`)
+      .then(res => setBalances(res.data))
+      .catch(err => toast.error(err.messag))
+      .finally(() => setLoading(false))
+  }, [])
+
+  return (
+    <section className="w-full rounded pt-8 pb-4 flex justify-around">
+      {loading ? (
+        <i className="fas fa-spinner fa-spin" />
+      ) : (
+        <Fragment>
+          <MoneyKV
+            title="Current Balance"
+            amount={twoDecimals(balances.balance)}
+          />
+          <MoneyKV
+            title="Monthly Spend"
+            amount={twoDecimals(balances.monthly_spend)}
+            dim
+          />
+        </Fragment>
+      )}
+    </section>
+  )
+}
 
 const Item = ({ item }) => (
   <div className="flex rounded-sm mb-4 relative">
@@ -97,31 +124,6 @@ const Purchases = () => (
       </button>
     </div>
   </section>
-)
-
-const FooterLink = ({ to, children }) => (
-  <Link className="no-underline text-grey text-sm mx-4" to={to}>
-    {children}
-  </Link>
-)
-
-const Footer = () => (
-  <footer>
-    <section className="container mx-auto py-10 sm:px-0 px-6 flex flex-col items-center justify-center">
-      <Link
-        to="/"
-        className="block no-underline text-pink font-black flex items-center mb-4"
-      >
-        <Logo width={30} className="inline-block mr-4" /> SayThanks
-      </Link>
-      <div>
-        <FooterLink to="/">Terms of Use</FooterLink>
-        <FooterLink to="/">Privacy</FooterLink>
-        <FooterLink to="/">Help</FooterLink>
-        <FooterLink to="/">Contact</FooterLink>
-      </div>
-    </section>
-  </footer>
 )
 
 const Home = ({ logout }) => (

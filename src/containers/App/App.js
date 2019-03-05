@@ -17,6 +17,7 @@ import PrivateRoute from '../util/PrivateRoute'
 import Embed from '../Embed/Embed'
 import config from '../../config'
 import Settings from '../Settings/Settings'
+import StaticPage from '../StaticPage/StaticPage'
 
 const Meat = ({ listen }) => {
   useEffect(() => listen(), [])
@@ -25,6 +26,7 @@ const Meat = ({ listen }) => {
     <Fragment>
       <ToastContainer />
       <Switch>
+        <Route path="/to/:app" component={StaticPage} />
         <Route path="/embed" exact component={Embed} />
         <PublicRoute path="/auth" component={Auth} />
         <PrivateRoute path="/settings" component={Settings} />

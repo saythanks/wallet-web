@@ -1,12 +1,14 @@
 import firebase from 'firebase/app'
 import 'firebase/auth'
 import SessionAPI from '../../api/sessionApi'
+import { requestEmailLink, verifyEmail } from '../../api/authAPI'
 
 const initialState = {
   authenticated: false,
   user: null,
   session: null,
   error: null,
+  tmpEmail: '',
 }
 
 export default {
@@ -21,26 +23,15 @@ export default {
     }),
     SET_ERROR: (state, error) => ({ ...state, error }),
     CLEAR_ERROR: state => ({ ...state, error: null }),
+    SET_TMP_EMAIL: (state, tmpEmail) => ({ ...state, tmpEmail }),
   },
   effects: dispatch => ({
-    // retrieveSession: () => {
-    //   dispatch.auth.CLEAR_ERROR()
-    //   return Auth.currentSession()
-    //     .then(dispatch.auth.SET_USER)
-    //     .catch(e => {
-    //       if (e !== 'No current user') dispatch.auth.SET_ERROR(e)
-    //     })
-    // },
-
-    // login: ({ email, password }) => {
-    // dispatch.auth.CLEAR_ERROR()
-    // return Auth.signIn(email, password)
-    //   .then(dispatch.auth.SET_USER)
-    //   .catch(dispatch.auth.SET_ERROR)
-    // },
-
-    // logout: () => AuthAPI.signOut().then(dispatch.auth.CLEAR_AUTH),
     logout: () => firebase.auth().signOut(),
+
+    requestEmailLogin: email =>
+      requestEmailLink(email).then(() => dispatch.auth.SET_TMP_EMAIL(email)),
+
+    verifyEmail: (url, rootState) => verifyEmail(rootState.auth.tmpEmail, url),
 
     // openLogin: () => AuthAPI.openSignIn(),
     // listen: () => AuthAPI.listen(payload => {}),

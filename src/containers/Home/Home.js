@@ -70,11 +70,11 @@ const Balance = () => {
         <Fragment>
           <MoneyKV
             title="Current Balance"
-            amount={twoDecimals(balances.balance || 0)}
+            amount={twoDecimals(balances && balances.balance || 0)}
           />
           <MoneyKV
             title="Monthly Spend"
-            amount={twoDecimals(balances.monthly_spend || 0)}
+            amount={twoDecimals(balances && balances.monthly_spend || 0)}
             dim
           />
         </Fragment>

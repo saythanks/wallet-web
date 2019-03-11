@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { ReactComponent as LogoWhite } from '../../img/logo_light.svg'
 import { Elements, CardElement } from 'react-stripe-elements'
 import { Link, Redirect } from 'react-router-dom'
@@ -80,7 +80,10 @@ const UnauthedForm = ({ payable }) => {
         top_up: 500,
         card_token: 'tok_visa',
       })
-      .then(() => toast.success(`Tipped ${payable.display_price}`))
+      .then(() => {
+        toast.success(`Tipped ${payable.display_price}`)
+        setStep(2)
+      })
       .catch(e => toast.error(e.message))
       .finally(() => {
         setLoading(false)
@@ -184,13 +187,13 @@ const UnauthedForm = ({ payable }) => {
     </div>
   )
 
-  const VerifyStep = () => (
-    <div>
-      {/* Thanks for giving! Click the link in your email to verify your account and
-      stay signed in, so you can SayThanks around with web with just a click. */}
-      <Redirect to={`/to/${payable.id}`} />
-    </div>
-  )
+  const VerifyStep = () => {
+    useEffect(() => {
+      window.location = payable.permalink
+    }, [])
+
+    return <div />
+  }
 
   return (
     <div className="bg-white overflow-hidden mb-6 mt-12 rounded-t-sm rounded-b-sm shadow-lg">

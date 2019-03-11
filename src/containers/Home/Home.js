@@ -49,18 +49,20 @@ const MoneyKV = ({ title, amount, dim = false } = {}) => (
   </div>
 )
 
-const Balance = () => {
+const Balance = ({ token, balance }) => {
   const [loading, setLoading] = useState(true)
   const [balances, setBalances] = useState()
 
   const twoDecimals = num => parseFloat(Math.round(num * 100) / 100).toFixed(2)
   useEffect(() => {
+    if (!token) return
+    axios.defaults.headers = { Authorization: `Bearer ${token}` }
     axios
       .get(`${config.api.baseUrl}/balance`)
       .then(res => setBalances(res.data))
       .catch(err => toast.error(err.messag))
       .finally(() => setLoading(false))
-  }, [])
+  }, [token])
 
   return (
     <section className="w-full rounded pt-8 pb-4 flex justify-around">
@@ -70,13 +72,13 @@ const Balance = () => {
         <Fragment>
           <MoneyKV
             title="Current Balance"
-            amount={twoDecimals(balances && balances.balance || 0)}
+            amount={twoDecimals((balances && balances.balance / 100) || 0)}
           />
-          <MoneyKV
+          {/* <MoneyKV
             title="Monthly Spend"
-            amount={twoDecimals(balances && balances.monthly_spend || 0)}
+            amount={twoDecimals((balances && balances.monthly_spend) || 0)}
             dim
-          />
+          /> */}
         </Fragment>
       )}
     </section>
@@ -126,11 +128,11 @@ const Purchases = () => (
   </section>
 )
 
-const Home = ({ logout }) => (
+const Home = ({ logout, token, balance }) => (
   <div className="font-sans">
     <div className="">
       <Header logout={logout}>
-        <Balance />
+        <Balance token={token} balance={balance} />
       </Header>
 
       <Purchases />
@@ -140,6 +142,9 @@ const Home = ({ logout }) => (
 )
 
 export default connect(
-  null,
+  state => ({
+    token: state.auth.user.idToken,
+    balance: state.user.balance,
+  }),
   dispatch => ({ logout: dispatch.auth.logout })
 )(Home)

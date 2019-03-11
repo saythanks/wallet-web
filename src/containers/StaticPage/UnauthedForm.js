@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { ReactComponent as LogoWhite } from '../../img/logo_light.svg'
 import { Elements, CardElement } from 'react-stripe-elements'
+import { Link } from 'react-router-dom'
 
 const FormGroup = ({ children, title = '', className = '' } = {}) => (
   <label className={'mb-8 block w-full' + className}>
@@ -53,13 +54,15 @@ const UnauthedForm = () => {
 
   const [step, setStep] = useState(0)
 
+  const [loading, setLoading] = useState(false)
+
   const CardInfo = () => (
     <div>
       <p className="text-center mb-6 text-grey-dark">
         Already have an account?{' '}
-        <a href="#login" className="text-pink">
+        <Link to="/login" className="text-pink">
           Login
-        </a>
+        </Link>
       </p>
       <form className="mb-8">
         <div className="flex justify-between flex-wrap sm:flex-no-wrap -mx-1">
@@ -70,10 +73,10 @@ const UnauthedForm = () => {
           <FormText title="Email" className="flex-1 w-full mx-1 sm:w-1/2" />
         </div>
         <CardElement className="px-3 py-3 border-2 border-grey-lightest focus:border-pink-lightest" />
-        <p className="text-xs text-grey mt-3  tracking-wide">
+        {/* <p className="text-xs text-grey mt-3  tracking-wide">
           You won't be charged now&mdash;we bill at the end of each month for
           all payments
-        </p>
+        </p> */}
       </form>
 
       <button
@@ -83,9 +86,6 @@ const UnauthedForm = () => {
         <LogoWhite width={20} className="mr-3" />
         <p className="flex items-baseline uppercase tracking-wide font-medium">
           Say Thanks for a Quarter
-          {/* <span className="text-xl text-white font-normal mb-1 ml-1 opacity-75"> */}
-          {/* quarter */}
-          {/* </span> */}
         </p>
       </button>
     </div>
@@ -111,14 +111,14 @@ const UnauthedForm = () => {
         .
       </p>
       <form className="mb-8">
-        <div className="flex justify-between flex-wrap sm:flex-no-wrap -mx-1">
+        {/* <div className="flex justify-between flex-wrap sm:flex-no-wrap -mx-1">
           <FormText title="Email" className="flex-1 w-full mx-1 sm:w-1/2" />
           <FormText
             title="Password"
             type="password"
             className="flex-1 w-full mx-1 sm:w-1/2"
           />
-        </div>
+        </div> */}
         <div>
           <ToggleButtons
             title="Top Up Account"
@@ -128,15 +128,34 @@ const UnauthedForm = () => {
           />
         </div>
       </form>
-      <button className="w-full bg-pink-lightest font-bold flex items-center justify-center tracking-wide text-pink-dark rounded-sm px-6 py-2">
-        {/* <LogoWhite width={20} className="mr-3" /> */}
-        <p className="flex items-baseline">
-          Create Account and Give 25
-          <span className="text-xl text-pink font-normal mb-1 ml-1 opacity-75">
-            ¢
-          </span>
-        </p>
+      <button
+        onClick={() => {
+          setLoading(true)
+          setInterval(() => {
+            setLoading(false)
+            setStep(2)
+          }, 300)
+        }}
+        className="w-full bg-pink-lightest font-bold flex items-center justify-center tracking-wide text-pink-dark rounded-sm px-6 py-2"
+      >
+        {loading ? (
+          'Loading...'
+        ) : (
+          <p className="flex items-baseline">
+            Create Account and Give 25
+            <span className="text-xl text-pink font-normal mb-1 ml-1 opacity-75">
+              ¢
+            </span>
+          </p>
+        )}
       </button>
+    </div>
+  )
+
+  const VerifyStep = () => (
+    <div>
+      Thanks for giving! Click the link in your email to verify your account and
+      stay signed in, so you can SayThanks around with web with just a click.
     </div>
   )
 
@@ -151,6 +170,7 @@ const UnauthedForm = () => {
         )}
 
         {step === 1 && <BalanceInfo />}
+        {step === 2 && <VerifyStep />}
       </div>
     </div>
   )

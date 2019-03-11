@@ -3,6 +3,7 @@ import createLoadingPlugin from '@rematch/loading'
 import createPersistPlugin from '@rematch/persist'
 
 import auth from './modules/auth'
+import user from './modules/auth'
 
 const loading = createLoadingPlugin({})
 const persist = createPersistPlugin({
@@ -11,7 +12,7 @@ const persist = createPersistPlugin({
 })
 
 const store = init({
-  models: { auth },
+  models: { auth, user },
   plugins: [loading, persist],
 })
 

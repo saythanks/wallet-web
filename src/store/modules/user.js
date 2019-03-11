@@ -10,17 +10,20 @@ const initialState = {
 export default {
   state: initialState,
   reducers: {
-    SET_BALANCES: (state, { balance, monthly_spend }) => ({
+    SET_BALANCE: (state, balance) => ({
       ...state,
       balance,
-      monthly_spend,
     }),
   },
   effects: dispatch => ({
-    loadBalance(rootState, payload) {
+    loadBalance(rootState) {
+      axios.defaults.headers = {
+        Authorization: `Bearer ${rootState.auth.user.idToken}`,
+      }
+
       return axios
         .get(`${config.api.baseUrl}/balance`)
-        .then(res => rootState.SET_BALANCES(res.data))
+        .then(res => rootState.SET_BALANCE(res.data.balance))
         .catch(err => toast.error(err.messag))
     },
   }),

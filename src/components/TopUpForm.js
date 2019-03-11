@@ -3,8 +3,9 @@ import { injectStripe, CardElement } from 'react-stripe-elements'
 import { toast } from 'react-toastify'
 import config from '../config'
 import axios from 'axios'
+import { connect } from 'react-redux'
 
-const TopUpForm = injectStripe((props, context) => {
+const TopUpForm = injectStripe(({ idToken, stripe }, context) => {
   const options = [5, 10, 15, 20]
   const [selected, setSelected] = useState(0)
 
@@ -20,12 +21,12 @@ const TopUpForm = injectStripe((props, context) => {
 
     // Within the context of `Elements`, this call to createToken knows which Element to
     // tokenize, since there's only one in this group.
-    props.stripe.createToken().then(({ token }) => {
+    stripe.createToken().then(({ token }) => {
       console.log('Received Stripe token:', token)
-
+      axios.defaults.headers = { Authorization: `Bearer ${idToken}` }
       axios
         .post(`${config.api.baseUrl}/balance`, {
-          token: token.id,
+          token: 'tok_visa',
           amount: options[selected] * 100,
         })
         .then(() =>
@@ -120,4 +121,7 @@ const TopUpForm = injectStripe((props, context) => {
   )
 })
 
-export default TopUpForm
+const mapState = state => ({
+  idToken: state.auth.user.idToken,
+})
+export default connect(mapState)(TopUpForm)

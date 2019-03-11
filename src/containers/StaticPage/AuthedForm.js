@@ -20,7 +20,10 @@ const AuthedForm = ({ payable, idToken }) => {
         payable: payable.id,
       })
       .then(() => toast.success(`Tipped ${payable.display_price}`))
-      .catch(e => toast.error(e.message))
+      .catch(e => {
+        console.error(e)
+        toast.error(e.message)
+      })
       .finally(() => {
         setLoading(false)
       })

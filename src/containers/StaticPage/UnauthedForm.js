@@ -1,7 +1,10 @@
 import React, { useState } from 'react'
 import { ReactComponent as LogoWhite } from '../../img/logo_light.svg'
 import { Elements, CardElement } from 'react-stripe-elements'
-import { Link } from 'react-router-dom'
+import { Link, Redirect } from 'react-router-dom'
+import axios from 'axios'
+import config from '../../config'
+import { toast } from 'react-toastify'
 
 const FormGroup = ({ children, title = '', className = '' } = {}) => (
   <label className={'mb-8 block w-full' + className}>
@@ -33,16 +36,24 @@ const ToggleButtons = ({ title, options, selected, onChange } = {}) => (
   </FormGroup>
 )
 
-const FormText = ({ type = 'text', title = '', className = '' } = {}) => (
+const FormText = ({
+  type = 'text',
+  onChange,
+  value,
+  title = '',
+  className = '',
+} = {}) => (
   <FormGroup title={title} className={className}>
     <input
       type={type}
+      value={value}
+      onChange={e => onChange(e.target.value)}
       className="px-3 py-2 block w-full text-lg focus:outline-none border-2 border-grey-lightest focus:border-pink-lightest"
     />
   </FormGroup>
 )
 
-const UnauthedForm = () => {
+const UnauthedForm = ({ payable }) => {
   const topups = [
     { name: '$5', value: '500' },
     { name: '$10', value: '1000' },
@@ -55,6 +66,26 @@ const UnauthedForm = () => {
   const [step, setStep] = useState(0)
 
   const [loading, setLoading] = useState(false)
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+
+  const pay = () => {
+    if (!payable) return
+    setLoading(true)
+    axios
+      .post(`${config.api.baseUrl}/transactions/new`, {
+        payable: payable.id,
+        name: name,
+        email: email,
+        top_up: 500,
+        card_token: 'tok_visa',
+      })
+      .then(() => toast.success(`Tipped ${payable.display_price}`))
+      .catch(e => toast.error(e.message))
+      .finally(() => {
+        setLoading(false)
+      })
+  }
 
   const CardInfo = () => (
     <div>
@@ -69,8 +100,15 @@ const UnauthedForm = () => {
           <FormText
             title="Name on Card"
             className="flex-1 w-full mx-1 sm:w-1/2"
+            value={name}
+            onChange={setName}
           />
-          <FormText title="Email" className="flex-1 w-full mx-1 sm:w-1/2" />
+          <FormText
+            title="Email"
+            className="flex-1 w-full mx-1 sm:w-1/2"
+            value={email}
+            onChange={setEmail}
+          />
         </div>
         <CardElement className="px-3 py-3 border-2 border-grey-lightest focus:border-pink-lightest" />
         {/* <p className="text-xs text-grey mt-3  tracking-wide">
@@ -129,13 +167,7 @@ const UnauthedForm = () => {
         </div>
       </form>
       <button
-        onClick={() => {
-          setLoading(true)
-          setInterval(() => {
-            setLoading(false)
-            setStep(2)
-          }, 300)
-        }}
+        onClick={pay}
         className="w-full bg-pink-lightest font-bold flex items-center justify-center tracking-wide text-pink-dark rounded-sm px-6 py-2"
       >
         {loading ? (
@@ -154,8 +186,9 @@ const UnauthedForm = () => {
 
   const VerifyStep = () => (
     <div>
-      Thanks for giving! Click the link in your email to verify your account and
-      stay signed in, so you can SayThanks around with web with just a click.
+      {/* Thanks for giving! Click the link in your email to verify your account and
+      stay signed in, so you can SayThanks around with web with just a click. */}
+      <Redirect to={`/to/${payable.id}`} />
     </div>
   )
 

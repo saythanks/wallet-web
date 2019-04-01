@@ -46,6 +46,8 @@ const StaticPage = ({ authenticated, match, location }) => {
 
   const { price, name, url } = queryString.parse(location.search)
 
+  const contentSpecific = name && url
+
   // if (loading) return <div>Loading...</div>
   if (!loading && !app) return <div>Not found</div>
 
@@ -77,7 +79,7 @@ const StaticPage = ({ authenticated, match, location }) => {
                   Say thanks <span className="text-grey">to</span>
                 </p>
 
-                <div className="flex justify-center items-center w-full ">
+                <div className="flex justify-center items-start w-full ">
                   <div className="flex-0 mr-6 ml-2">
                     <img
                       src={app.image_url}
@@ -92,14 +94,21 @@ const StaticPage = ({ authenticated, match, location }) => {
                           {app.name}
                         </span>{' '}
                       </p>
-                      <p className="text-grey text-lg">{app.description}</p>
-                      {name && (
-                        <a
-                          href="#link"
-                          className=" text-pink no-underline border-b-2 border-pink-lighter"
-                        >
-                          For {name}
-                        </a>
+                      {!contentSpecific && (
+                        <p className="text-grey text-lg">{app.description}</p>
+                      )}
+                      {contentSpecific && (
+                        <div>
+                          <p className="uppercase tracking-wide text-grey-light text-sm font-bold inline mr-1">
+                            For
+                          </p>
+                          <a
+                            href={url}
+                            className=" text-pink no-underline border-b-2 border-pink-lighter"
+                          >
+                            {name}
+                          </a>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -111,7 +120,7 @@ const StaticPage = ({ authenticated, match, location }) => {
                   {authenticated ? (
                     <AuthedForm payable={payable} app={app} price={price} />
                   ) : (
-                    <UnauthedForm payable={payable} />
+                    <UnauthedForm payable={payable} app={app} price={price} />
                   )}
                 </div>
               </div>

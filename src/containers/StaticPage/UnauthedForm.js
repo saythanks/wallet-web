@@ -5,6 +5,7 @@ import { Link, Redirect } from 'react-router-dom'
 import axios from 'axios'
 import config from '../../config'
 import { toast } from 'react-toastify'
+import { formatCents } from '../../util/currency'
 
 const FormGroup = ({ children, title = '', className = '' } = {}) => (
   <label className={'mb-8 block w-full' + className}>
@@ -53,7 +54,7 @@ const FormText = ({
   </FormGroup>
 )
 
-const UnauthedForm = ({ payable, app }) => {
+const UnauthedForm = ({ payable, app, price }) => {
   const topups = [
     { name: '$5', value: '500' },
     { name: '$10', value: '1000' },
@@ -70,21 +71,26 @@ const UnauthedForm = ({ payable, app }) => {
   const [email, setEmail] = useState('')
 
   const pay = () => {
-    if (!payable) return
+    if (!app) return
     setLoading(true)
     axios
       .post(`${config.api.baseUrl}/transactions/new`, {
         app: app.id,
+        price,
         name: name,
         email: email,
         top_up: 500,
         card_token: 'tok_visa',
       })
       .then(() => {
-        toast.success(`Tipped ${payable.display_price}`)
+        toast.success(`Tipped ${formatCents(price)}`)
         setStep(2)
       })
-      .catch(e => toast.error(e.message))
+      .catch(e => {
+        if (e.response && e.response.data)
+          toast.error(e.response && e.response.data && e.response.data.message)
+        else toast.error(e.message)
+      })
       .finally(() => {
         setLoading(false)
       })
@@ -92,13 +98,13 @@ const UnauthedForm = ({ payable, app }) => {
 
   useEffect(() => {
     if (step === 2) {
-      window.location = payable.permalink
+      // window.location = payable.permalink
     }
   }, [step])
 
   return (
-    <div className="bg-white overflow-hidden mb-6 mt-12 rounded-t-sm rounded-b-sm shadow-lg">
-      <div className="color-bar w-full h-1 bg-pink-light" />
+    <div className="bg-white overflow-hidden mb-6">
+      {/* <div className="color-bar w-full h-1 bg-pink-light" /> */}
       <div className="p-6">
         {step === 0 && (
           <Elements>
@@ -125,10 +131,6 @@ const UnauthedForm = ({ payable, app }) => {
                   />
                 </div>
                 <CardElement className="px-3 py-3 border-2 border-grey-lightest focus:border-pink-lightest" />
-                {/* <p className="text-xs text-grey mt-3  tracking-wide">
-                  You won't be charged now&mdash;we bill at the end of each month for
-                  all payments
-                </p> */}
               </form>
 
               <button
@@ -137,7 +139,7 @@ const UnauthedForm = ({ payable, app }) => {
               >
                 <LogoWhite width={20} className="mr-3" />
                 <p className="flex items-baseline uppercase tracking-wide font-medium">
-                  Say Thanks for a Quarter
+                  Say Thanks for {formatCents(price)}
                 </p>
               </button>
             </div>
@@ -189,16 +191,18 @@ const UnauthedForm = ({ payable, app }) => {
                 'Loading...'
               ) : (
                 <p className="flex items-baseline">
-                  Create Account and Give 25
-                  <span className="text-xl text-pink font-normal mb-1 ml-1 opacity-75">
-                    ¢
-                  </span>
+                  Create Account and Give {formatCents(price)}
                 </p>
               )}
             </button>
           </div>
         )}
-        {step === 2 && <div />}
+        {step === 2 && (
+          <div>
+            Thanks for giving!{' '}
+            <Link to="/login">Login and verify your email to give more.</Link>
+          </div>
+        )}
       </div>
     </div>
   )

@@ -53,7 +53,7 @@ const FormText = ({
   </FormGroup>
 )
 
-const UnauthedForm = ({ payable }) => {
+const UnauthedForm = ({ payable, app }) => {
   const topups = [
     { name: '$5', value: '500' },
     { name: '$10', value: '1000' },
@@ -74,7 +74,7 @@ const UnauthedForm = ({ payable }) => {
     setLoading(true)
     axios
       .post(`${config.api.baseUrl}/transactions/new`, {
-        payable: payable.id,
+        app: app.id,
         name: name,
         email: email,
         top_up: 500,

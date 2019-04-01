@@ -7,6 +7,8 @@ import UnauthedForm from './UnauthedForm'
 import axios from 'axios'
 import config from '../../config'
 import { toast } from 'react-toastify'
+import queryString from 'query-string'
+import Spinner from '../../components/Spinner/Spinner'
 /**
  * This page is what you see when you click a static link to donate.
  * It needs to handle the following state:
@@ -29,73 +31,92 @@ import { toast } from 'react-toastify'
  *
  */
 
-const StaticPage = ({ authenticated, match }) => {
-  const [loading, setLoading] = useState(false)
+const StaticPage = ({ authenticated, match, location }) => {
+  const [loading, setLoading] = useState(true)
   const [payable, setPayable] = useState(null)
+  const [app, setApp] = useState(null)
 
   useEffect(() => {
     axios
-      .get(`${config.api.baseUrl}/payables/${match.params.id}`)
-      .then(res => setPayable(res.data))
+      .get(`${config.api.baseUrl}/apps/${match.params.id}`)
+      .then(res => setApp(res.data))
       .catch(e => toast.error(e.message))
       .finally(() => setLoading(false))
   }, [match.params.id])
 
-  if (loading) return <div>Loading...</div>
-  if (!payable) return <div>Not found</div>
+  const { price, name, url } = queryString.parse(location.search)
+
+  // if (loading) return <div>Loading...</div>
+  if (!loading && !app) return <div>Not found</div>
 
   return (
-    <div className="container mx-auto ">
-      <div className="max-w-sm mx-auto mb-12">
-        <div className="wrap px-6">
-          <div className="flex justify-center w-full mb-6">
-            <Link
-              to="/"
-              className="text-pink font-black inline-block mt-8 mb-0"
-            >
-              <Logo width={30} className="inline-block mr-4" />
-            </Link>
-          </div>
-          <section>
-            <p className="uppercase text-xl font-bold tracking-wide text-grey-dark mb-6 text-center">
-              Say thanks <span className="text-grey">to</span>
-            </p>
-
-            <div className="flex justify-between">
-              {/* <div className="flex-0 mr-6 ml-2">
-                <img
-                  src="https://dxj7eshgz03ln.cloudfront.net/production/category/header_icon/14/9382dce1-b0f9-49e2-bf1c-cfaede9c74c3.png"
-                  className="rounded-full w-16 shadow-inner"
-                  alt="Author"
+    <div className="container mx-auto min-h-full pt-32 pb-12">
+      <div className="max-w-sm mx-auto mb-12 h-full flex-1">
+        <div className="w-full text-center z-0 opacity-50">
+          <Logo
+            width={70}
+            className="inline-block"
+            style={{ marginBottom: -5 }}
+          />
+        </div>
+        <div className="wrap px-6 bg-white shadow-md rounded border border-grey-200 ">
+          {loading ? (
+            <div className="w-full h-32 flex items-center justify-center pr-4">
+              <Spinner />
+            </div>
+          ) : (
+            <div>
+              <div className="flex justify-center w-full mb-6">
+                <Link
+                  to="/"
+                  className="text-pink font-black inline-block mb-0"
                 />
-              </div> */}
-              <div className="flex-1 self-center text-center">
-                <div className="text-3xl leading-normal text-center">
-                  <p>
-                    <span className="text-3xl my-2 font-bold">
-                      {payable.app.name}
-                    </span>{' '}
-                    for{' '}
-                  </p>
-                  <a
-                    href="#link"
-                    className="text-3xl text-pink no-underline border-b-2 border-pink-lighter"
-                  >
-                    {payable.display_name}
-                  </a>
+              </div>
+              <section>
+                <p className="uppercase text-xl font-bold tracking-wide text-grey-dark mb-6 text-center">
+                  Say thanks <span className="text-grey">to</span>
+                </p>
+
+                <div className="flex justify-center items-center w-full ">
+                  <div className="flex-0 mr-6 ml-2">
+                    <img
+                      src={app.image_url}
+                      className="rounded-full block w-16 shadow-inner"
+                      alt="Author"
+                    />
+                  </div>
+                  <div className="flex-0 self-center ">
+                    <div className="leading-normal text-left">
+                      <p className="text-2xl text-black  ">
+                        <span className="text-3xl my-2 font-bold">
+                          {app.name}
+                        </span>{' '}
+                      </p>
+                      <p className="text-grey text-lg">{app.description}</p>
+                      {name && (
+                        <a
+                          href="#link"
+                          className=" text-pink no-underline border-b-2 border-pink-lighter"
+                        >
+                          For {name}
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <div className="">
+                <div>
+                  {authenticated ? (
+                    <AuthedForm payable={payable} app={app} price={price} />
+                  ) : (
+                    <UnauthedForm payable={payable} />
+                  )}
                 </div>
               </div>
             </div>
-          </section>
-        </div>
-        <div className="pb-12">
-          <div>
-            {authenticated ? (
-              <AuthedForm payable={payable} />
-            ) : (
-              <UnauthedForm payable={payable} />
-            )}
-          </div>
+          )}
         </div>
       </div>
     </div>

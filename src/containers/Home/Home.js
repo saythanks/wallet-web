@@ -7,6 +7,9 @@ import Footer from '../../components/Footer'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import config from '../../config'
+import Spinner from '../../components/Spinner/Spinner'
+import { Link } from 'react-router-dom'
+import { formatCents } from '../../util/currency'
 
 let content = []
 for (let i = 0; i < 5; i++) {
@@ -93,53 +96,92 @@ const Item = ({ item }) => (
     />
     <div className="flex-1  pl-4">
       <p className="text-grey mb-4 text-xs font-bold uppercase tracking-wide">
-        {moment(item.date).fromNow()}
+        {moment(new Date(item.time_created)).fromNow()}
       </p>
       <p className="mb-8 text-grey-darkest leading-loose text-xl">
-        Bought{' '}
-        <a
-          href="#permalink"
+        Gave <span className="font-bold">{formatCents(item.amount)}</span> to{' '}
+        <Link
+          to={`/to/${item.app.id}`}
           className="no-underline font-pink border-b-2 border-pink-lighter text-pink-dark"
         >
-          {item.title}
-        </a>{' '}
-        from <span className="font-semibold">{item.source}</span> for{' '}
-        <span className="font-bold">${item.price}</span>
+          {item.app.name}
+        </Link>
       </p>
     </div>
   </div>
 )
 
-const Purchases = () => (
+const Purchases = ({ loading, transactions, setPage, page }) => (
   <section className=" max-w-sm mx-auto mt-24 mb-24">
-    <div className=" relative">
-      <div className="timeline absolute pin-l w-1 h-full bg-grey-light rounded-sm" />
-      <div className="">
-        {content.map(a => (
-          <Item key={a.id} item={a} />
-        ))}
-      </div>
-    </div>
-    <div className="text-center">
-      <button className="font-semibold text-grey-dark border-b border-grey-light focus:outline-none hover:text-grey-darker">
-        See all
-      </button>
-    </div>
+    {loading ? (
+      <Spinner />
+    ) : !transactions ? (
+      <div>Could not load transactions</div>
+    ) : (
+      <>
+        <div className="relative">
+          <div className="timeline absolute pin-l w-1 h-full bg-grey-light rounded-sm" />
+          <div className="">
+            {transactions.items.map(a => (
+              <Item key={a.id} item={a} />
+            ))}
+          </div>
+        </div>
+        <div className="text-center">
+          <button
+            onClick={() => setPage(Math.max(page - 1, 1))}
+            className="font-semibold mr-2 text-grey-dark border-b border-grey-light focus:outline-none hover:text-grey-darker"
+          >
+            Prev
+          </button>
+          <button
+            onClick={() => {
+              if (transactions.has_next) setPage(page + 1)
+            }}
+            className="font-semibold text-grey-dark border-b border-grey-light focus:outline-none hover:text-grey-darker"
+          >
+            Next
+          </button>
+        </div>
+      </>
+    )}
   </section>
 )
 
-const Home = ({ logout, token, balance }) => (
-  <div className="font-sans">
-    <div className="">
-      <Header logout={logout}>
-        <Balance token={token} balance={balance} />
-      </Header>
+const Home = ({ logout, token, balance }) => {
+  const [loading, setLoading] = useState(true)
+  const [page, setPage] = useState(1)
+  const [transactions, setTransactions] = useState(null)
 
-      <Purchases />
-      <Footer />
+  useEffect(() => {
+    if (!token) return
+    setLoading(true)
+    axios.defaults.headers = { Authorization: `Bearer ${token}` }
+    axios
+      .get(`${config.api.baseUrl}/transactions/from?page=${page}`)
+      .then(res => setTransactions(res.data))
+      .catch(err => toast.error(err.message))
+      .finally(() => setLoading(false))
+  }, [token, page])
+
+  return (
+    <div className="font-sans">
+      <div className="">
+        <Header logout={logout}>
+          <Balance token={token} balance={balance} />
+        </Header>
+
+        <Purchases
+          loading={loading}
+          transactions={transactions}
+          setPage={setPage}
+          page={page}
+        />
+        <Footer />
+      </div>
     </div>
-  </div>
-)
+  )
+}
 
 export default connect(
   state => ({

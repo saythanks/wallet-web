@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { connect } from 'react-redux'
+import { Input } from '../../components/Form'
 // import firebase from 'firebase/app'
 // import 'firebase/auth'
 // import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth'
@@ -28,26 +29,47 @@ const Login = ({ requestEmailLogin }) => {
   const handleSubmit = e => {
     e.preventDefault()
     setSubmitted(true)
-
-    console.log(email, window.location.href)
-    requestEmailLogin(email, window.location.href).catch(console.error)
+    requestEmailLogin(email)
   }
 
   return (
-    <div className="my-16">
-      {!submitted && (
-        <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            className="px-4 py-2 block"
-            placeholder="Email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-          />
-          <button className="my-4 bg-pink text-white p-4">Sign in</button>
-        </form>
-      )}
-      {submitted && <div>Thanks! Check your email</div>}
+    <div className="container mx-auto h-full flex items-center justify-center">
+      <div className="flex-1 max-w-sm mx-auto bg-white m-6 rounded-sm overflow-hidden shadow-lg">
+        <div className="w-full h-1 bg-pink" />
+
+        <div className="p-6">
+          <h1 className="text-grey-dark uppercase tracking-wide text-base pb-3 mb-5 border-b border-grey-lighter">
+            Sign in
+          </h1>
+          {!submitted ? (
+            <form onSubmit={handleSubmit} className="clearfix">
+              <Input title="Email" value={email} onChange={setEmail} />
+
+              <button className="bg-pink px-4 py-2 text-white rounded-sm float-right shadow-lg block font-bold">
+                Sign in
+              </button>
+            </form>
+          ) : (
+            <div>
+              <p className="text-grey mb-2">
+                A sign-in link has been sent to your email.
+              </p>
+              <p>
+                <a
+                  href="#tryAgain"
+                  className="text-pink no-underline pb-1 text-sm"
+                  onClick={e => {
+                    e.preventDefault()
+                    setSubmitted(false)
+                  }}
+                >
+                  Didn't recieve an email? Try again
+                </a>
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   )
 }

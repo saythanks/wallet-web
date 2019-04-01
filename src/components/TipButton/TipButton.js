@@ -4,17 +4,29 @@ import useDebounce from 'react-use/lib/useDebounce'
 import { ReactComponent as Logo } from '../../img/logo_light.svg'
 import './TipButton.css'
 
-const TipButton = ({ price = 50 }) => {
+const TipButton = ({ price = 50, onPay, baseline = 0 }) => {
   const [count, setCount] = useState(0)
   const [delta, setDelta] = useState(0)
   const [isClicked, setIsClicked] = useState(false)
   const [timeline, setTimeline] = useState(null)
 
+  const totalCount = count + baseline
+
   useDebounce(
     () => {
-      console.log(`Processing payment for ${(count - delta) * price}`)
-      console.log(`Total paid is ${count * price}`)
-      setDelta(count)
+      const dCount = count - delta
+      const amount = dCount * price
+      if (amount > 0) {
+        onPay(price, dCount).then(({ success, data, failedCount }) => {
+          if (!success || failedCount >= 0) {
+            setCount(count - failedCount)
+            setDelta(count - failedCount)
+          }
+        })
+        console.log(`Processing payment for ${(count - delta) * price}`)
+        console.log(`Total paid is ${totalCount * price}`)
+        setDelta(count)
+      }
     },
     1000,
     [count]
@@ -126,10 +138,10 @@ const TipButton = ({ price = 50 }) => {
       </span>
       {randomMessage()}
       <span id="clap--count" className="clap--count">
-        + {formatCents(clicksToCents(count))}
+        + {formatCents(clicksToCents(totalCount))}
       </span>
       <span id="clap--count-total" className="clap--count-total">
-        {formatCents(clicksToCents(count))} Given
+        {formatCents(clicksToCents(totalCount))} Given
       </span>
     </button>
   )

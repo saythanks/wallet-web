@@ -4,20 +4,21 @@ import { connect } from 'react-redux'
 import axios from 'axios'
 import config from '../../config'
 import { toast } from 'react-toastify'
+import TipButton from '../../components/TipButton/TipButton'
 
-const AuthedForm = ({ payable, idToken }) => {
+const AuthedForm = ({ payable, app, idToken, price }) => {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     axios.defaults.headers = { Authorization: `Bearer ${idToken}` }
-  })
+  }, [])
 
   const pay = () => {
-    if (!payable) return
+    if (!app) return
     setLoading(true)
     axios
       .post(`${config.api.baseUrl}/transactions`, {
-        payable: payable.id,
+        app: app.id,
       })
       .then(() => toast.success(`Tipped ${payable.display_price}`))
       .catch(e => {
@@ -30,18 +31,9 @@ const AuthedForm = ({ payable, idToken }) => {
   }
 
   return (
-    <div className="mt-12">
+    <div className="mt-8" style={{ transform: 'translateY(50%)' }}>
       <section className="flex justify-center">
-        <button
-          disabled={loading}
-          className="flex items-center justify-center px-8 py-1 uppercase tracking-wide
-                     bg-pink-dark text-white rounded-sm font-bold 
-                     active:bg-pink active:text-pink-lightest"
-          onClick={pay}
-        >
-          <Logo width={20} className="mr-2" />
-          {loading ? 'Loading...' : 'Say thanks for a dime'}
-        </button>
+        <TipButton price={price} />
       </section>
     </div>
   )

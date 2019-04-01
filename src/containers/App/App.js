@@ -23,7 +23,7 @@ const Meat = ({ listen }) => {
   useEffect(() => listen(), [])
 
   return (
-    <Fragment>
+    <>
       <ToastContainer />
       <Switch>
         <Route path="/to/:id" component={StaticPage} />
@@ -32,7 +32,7 @@ const Meat = ({ listen }) => {
         <PrivateRoute path="/settings" component={Settings} />
         <PrivateRoute path="/" component={Home} />
       </Switch>
-    </Fragment>
+    </>
   )
 }
 

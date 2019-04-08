@@ -1,8 +1,9 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { ReactComponent as Logo } from '../containers/Home/LogoB.svg'
+import { formatCents } from '../util/currency'
 
-const Nav = ({ logout }) => {
+const Nav = ({ logout, balance = 1000 }) => {
   const handleLogout = e => {
     e.preventDefault()
     logout()
@@ -26,6 +27,9 @@ const Nav = ({ logout }) => {
           </Link>
         </div>
         <div className="flex items-center ">
+          <button className="bg-grey-lightest px-3 py-2 rounded shadow border block hover:shadow-lg">
+            <span className="font-medium">{formatCents(balance)}</span> balance
+          </button>
           <Link to="/settings" className={mainStyle}>
             Settings
           </Link>

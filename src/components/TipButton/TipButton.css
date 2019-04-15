@@ -9,6 +9,16 @@
   @apply bg-pink text-white;
 }
 
+.tip-button.tall {
+  @apply py-4;
+}
+
+.tip-button.-disabled {
+  @apply shadow-none;
+  @apply cursor-pointer;
+  @apply bg-grey-dark border-grey-dark;
+}
+
 .tip-button::after {
   content: '';
   position: absolute;

@@ -60,28 +60,19 @@ const Balance = ({ token, balance }) => {
   useEffect(() => {
     if (!token) return
     axios.defaults.headers = { Authorization: `Bearer ${token}` }
-    axios
-      .get(`${config.api.baseUrl}/balance`)
-      .then(res => setBalances(res.data))
-      .catch(err => toast.error(err.messag))
-      .finally(() => setLoading(false))
+    axios.get(`${config.api.baseUrl}/balance`).finally(() => setLoading(false))
   }, [token])
 
   return (
     <section className="w-full rounded pt-8 pb-4 flex justify-around">
       {loading ? (
-        <i className="fas fa-spinner fa-spin" />
+        <Spinner />
       ) : (
         <Fragment>
           <MoneyKV
             title="Current Balance"
-            amount={twoDecimals((balances && balances.balance / 100) || 0)}
+            amount={twoDecimals(balance / 100 || 0)}
           />
-          {/* <MoneyKV
-            title="Monthly Spend"
-            amount={twoDecimals((balances && balances.monthly_spend) || 0)}
-            dim
-          /> */}
         </Fragment>
       )}
     </section>
@@ -148,26 +139,42 @@ const Purchases = ({ loading, transactions, setPage, page }) => (
   </section>
 )
 
-const Home = ({ logout, token, balance }) => {
+const Home = ({ logout, token, balance, setBalance, loadInfo }) => {
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
   const [transactions, setTransactions] = useState(null)
+  const [balances, setBalances] = useState()
 
   useEffect(() => {
     if (!token) return
     setLoading(true)
+    loadInfo()
+
     axios.defaults.headers = { Authorization: `Bearer ${token}` }
-    axios
-      .get(`${config.api.baseUrl}/transactions/from?page=${page}`)
-      .then(res => setTransactions(res.data))
-      .catch(err => toast.error(err.message))
-      .finally(() => setLoading(false))
+    const promises = []
+    promises.push(
+      axios
+        .get(`${config.api.baseUrl}/transactions/from?page=${page}`)
+        .then(res => setTransactions(res.data))
+        .catch(err => toast.error(err.message))
+    )
+
+    promises.push(
+      axios
+        .get(`${config.api.baseUrl}/balance`)
+        .then(res => {
+          setBalances(res.data)
+          setBalance(res.data.balance)
+        })
+        .catch(err => toast.error(err.messag))
+    )
+    Promise.all(promises).finally(() => setLoading(false))
   }, [token, page])
 
   return (
     <div className="font-sans">
       <div className="">
-        <Header logout={logout}>
+        <Header withCashForm={true} logout={logout} showBalance={false}>
           <Balance token={token} balance={balance} />
         </Header>
 
@@ -186,7 +193,11 @@ const Home = ({ logout, token, balance }) => {
 export default connect(
   state => ({
     token: state.auth.user.idToken,
-    balance: state.user.balance,
+    balance: state.auth.balance,
   }),
-  dispatch => ({ logout: dispatch.auth.logout })
+  dispatch => ({
+    logout: dispatch.auth.logout,
+    setBalance: dispatch.auth.SET_BALANCE,
+    loadInfo: dispatch.user.loadInfo,
+  })
 )(Home)

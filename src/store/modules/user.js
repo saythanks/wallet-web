@@ -1,22 +1,38 @@
 import axios from 'axios'
 import config from '../../config'
-import toast from 'toast'
 
 const initialState = {
   balance: 0,
-  monthly_spend: 0,
+  user: null,
 }
 
 export default {
   state: initialState,
   reducers: {
+    SET: (state, update) => ({
+      ...state,
+      ...update,
+    }),
+
     SET_BALANCE: (state, balance) => ({
       ...state,
       balance,
     }),
   },
   effects: dispatch => ({
-    loadBalance(rootState) {
+    loadInfo(payload, rootState) {
+      console.log(rootState)
+      axios.defaults.headers = {
+        Authorization: `Bearer ${rootState.auth.user.idToken}`,
+      }
+
+      return axios
+        .get(`${config.api.baseUrl}/me`)
+        .then(res => dispatch.SET(res.data))
+        .catch(console.error)
+    },
+
+    loadBalance(payload, rootState) {
       axios.defaults.headers = {
         Authorization: `Bearer ${rootState.auth.user.idToken}`,
       }
@@ -24,7 +40,7 @@ export default {
       return axios
         .get(`${config.api.baseUrl}/balance`)
         .then(res => rootState.SET_BALANCE(res.data.balance))
-        .catch(err => toast.error(err.messag))
+        .catch(console.error)
     },
   }),
 }

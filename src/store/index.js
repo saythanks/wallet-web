@@ -3,7 +3,7 @@ import createLoadingPlugin from '@rematch/loading'
 import createPersistPlugin from '@rematch/persist'
 
 import auth from './modules/auth'
-import user from './modules/auth'
+import user from './modules/user'
 
 const loading = createLoadingPlugin({})
 const persist = createPersistPlugin({

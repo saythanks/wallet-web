@@ -2,8 +2,9 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { ReactComponent as Logo } from '../containers/Home/LogoB.svg'
 import { formatCents } from '../util/currency'
+import { connect } from 'react-redux'
 
-const Nav = ({ logout, balance = 1000 }) => {
+const Nav = ({ logout, balance, showBalance = true }) => {
   const handleLogout = e => {
     e.preventDefault()
     logout()
@@ -27,9 +28,15 @@ const Nav = ({ logout, balance = 1000 }) => {
           </Link>
         </div>
         <div className="flex items-center ">
-          <button className="bg-grey-lightest px-3 py-2 rounded shadow border block hover:shadow-lg">
-            <span className="font-medium">{formatCents(balance)}</span> balance
-          </button>
+          {showBalance && (
+            <Link
+              to="/"
+              className="no-underline bg-grey-lightest px-3 py-2 rounded shadow border block hover:shadow-lg mr-4 text-black"
+            >
+              <span className="font-medium">{formatCents(balance)}</span>{' '}
+              balance
+            </Link>
+          )}
           <Link to="/settings" className={mainStyle}>
             Settings
           </Link>
@@ -42,4 +49,4 @@ const Nav = ({ logout, balance = 1000 }) => {
   )
 }
 
-export default Nav
+export default connect(state => ({ balance: state.auth.balance }))(Nav)

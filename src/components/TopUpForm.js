@@ -5,7 +5,7 @@ import config from '../config'
 import axios from 'axios'
 import { connect } from 'react-redux'
 
-const TopUpForm = injectStripe(({ idToken, stripe }, context) => {
+const TopUpForm = injectStripe(({ idToken, stripe, setBalance }) => {
   const options = [5, 10, 15, 20]
   const [selected, setSelected] = useState(0)
 
@@ -29,8 +29,10 @@ const TopUpForm = injectStripe(({ idToken, stripe }, context) => {
           token: 'tok_visa',
           amount: options[selected] * 100,
         })
-        .then(() =>
-          toast.success(`$${options[selected]} added to your account!`)
+        .then(res => res.data)
+        .then(
+          data => setBalance(data.balance)
+          // toast.success(`$${options[selected]} added to your account!`)
         )
         .catch(e => toast.error(e.message))
         .finally(() => {
@@ -124,4 +126,11 @@ const TopUpForm = injectStripe(({ idToken, stripe }, context) => {
 const mapState = state => ({
   idToken: state.auth.user.idToken,
 })
-export default connect(mapState)(TopUpForm)
+
+const mapDispatch = dispatch => ({
+  setBalance: dispatch.auth.SET_BALANCE,
+})
+export default connect(
+  mapState,
+  mapDispatch
+)(TopUpForm)

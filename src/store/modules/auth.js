@@ -9,6 +9,7 @@ const initialState = {
   session: null,
   error: null,
   tmpEmail: '',
+  balance: 0,
 }
 
 export default {
@@ -24,6 +25,7 @@ export default {
     SET_ERROR: (state, error) => ({ ...state, error }),
     CLEAR_ERROR: state => ({ ...state, error: null }),
     SET_TMP_EMAIL: (state, tmpEmail) => ({ ...state, tmpEmail }),
+    SET_BALANCE: (state, balance) => ({ ...state, balance }),
   },
   effects: dispatch => ({
     logout: () => firebase.auth().signOut(),

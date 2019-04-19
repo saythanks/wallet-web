@@ -3,8 +3,15 @@ import mojs from 'mo-js'
 import useDebounce from 'react-use/lib/useDebounce'
 import { ReactComponent as Logo } from '../../img/logo_light.svg'
 import './TipButton.css'
+import { Link } from 'react-router-dom'
 
-const TipButton = ({ price = 50, onPay, baseline = 0 }) => {
+const TipButton = ({
+  price = 50,
+  onPay,
+  baseline = 0,
+  onIndividualClick = () => null,
+  disabled,
+}) => {
   const [count, setCount] = useState(0)
   const [delta, setDelta] = useState(0)
   const [isClicked, setIsClicked] = useState(false)
@@ -33,6 +40,7 @@ const TipButton = ({ price = 50, onPay, baseline = 0 }) => {
   )
 
   useEffect(() => {
+    if (disabled) return
     const tlDuration = 300
     const triangleBurst = new mojs.Burst({
       parent: '#clap',
@@ -123,14 +131,29 @@ const TipButton = ({ price = 50, onPay, baseline = 0 }) => {
 
   const handleClick = () => {
     timeline.replay()
+    onIndividualClick(price)
     setCount(count + 1)
     setIsClicked(true)
   }
 
+  if (disabled)
+    return (
+      <Link
+        to="/"
+        className="tip-button tall focus:outline-none bg-pink shadow-lg no-underline rounded-full py-4 block text-white font-bold"
+      >
+        Add Funds to Account
+      </Link>
+    )
+
   return (
     <button
-      className="tip-button focus:outline-none flex items-center"
+      className={
+        'tip-button focus:outline-none flex items-center ' +
+        (disabled ? '-disabled' : '')
+      }
       id="clap"
+      disabled={disabled}
       onClick={handleClick}
     >
       <span className="clap-icon mr-2">

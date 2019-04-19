@@ -9,6 +9,8 @@ import config from '../../config'
 import { toast } from 'react-toastify'
 import queryString from 'query-string'
 import Spinner from '../../components/Spinner/Spinner'
+import Nav from '../../components/Nav'
+import Header from '../../components/Header'
 /**
  * This page is what you see when you click a static link to donate.
  * It needs to handle the following state:
@@ -31,7 +33,15 @@ import Spinner from '../../components/Spinner/Spinner'
  *
  */
 
-const StaticPage = ({ authenticated, match, location }) => {
+const StaticPage = ({
+  authenticated,
+  match,
+  location,
+  logout,
+  balance,
+  setBalance,
+  token,
+}) => {
   const [loading, setLoading] = useState(true)
   const [payable, setPayable] = useState(null)
   const [app, setApp] = useState(null)
@@ -44,6 +54,16 @@ const StaticPage = ({ authenticated, match, location }) => {
       .finally(() => setLoading(false))
   }, [match.params.id])
 
+  useEffect(() => {
+    if (!token) return
+    axios.defaults.headers = { Authorization: `Bearer ${token}` }
+    axios
+      .get(`${config.api.baseUrl}/balance`)
+      .then(res => setBalance(res.data.balance))
+      .catch(err => toast.error(err.messag))
+      .finally(() => setLoading(false))
+  }, [token])
+
   const { price, name, url } = queryString.parse(location.search)
 
   const contentSpecific = name && url
@@ -52,86 +72,97 @@ const StaticPage = ({ authenticated, match, location }) => {
   if (!loading && !app) return <div>Not found</div>
 
   return (
-    <div className="container mx-auto min-h-full pt-32 pb-12">
-      <div className="max-w-sm mx-auto mb-12 h-full flex-1">
-        <div className="w-full text-center z-0 opacity-50">
-          <Logo
-            width={70}
-            className="inline-block"
-            style={{ marginBottom: -5 }}
-          />
-        </div>
-        <div className="wrap px-6 bg-white shadow-md rounded border border-grey-200 ">
-          {loading ? (
-            <div className="w-full h-32 flex items-center justify-center pr-4">
-              <Spinner />
-            </div>
-          ) : (
-            <div>
-              <div className="flex justify-center w-full mb-6">
-                <Link
-                  to="/"
-                  className="text-pink font-black inline-block mb-0"
-                />
+    <div className="">
+      <Header withCashForm={false} logout={logout} balance={balance} />
+      <div className="container mx-auto min-h-full pt-16 pb-12">
+        <div className="max-w-sm mx-auto mb-12 h-full flex-1">
+          <div className="w-full text-center z-0 opacity-50">
+            <Logo
+              width={70}
+              className="inline-block"
+              style={{ marginBottom: -5 }}
+            />
+          </div>
+          <div className="wrap px-6 bg-white shadow-md rounded border border-grey-200 ">
+            {loading ? (
+              <div className="w-full h-32 flex items-center justify-center pr-4">
+                <Spinner />
               </div>
-              <section>
-                <p className="uppercase text-xl font-bold tracking-wide text-grey-dark mb-6 text-center">
-                  Say thanks <span className="text-grey">to</span>
-                </p>
+            ) : (
+              <div>
+                <div className="flex justify-center w-full mb-6">
+                  <Link
+                    to="/"
+                    className="text-pink font-black inline-block mb-0"
+                  />
+                </div>
+                <section>
+                  <p className="uppercase text-xl font-bold tracking-wide text-grey-dark mb-6 text-center">
+                    Say thanks <span className="text-grey">to</span>
+                  </p>
 
-                <div className="flex justify-center items-start w-full ">
-                  <div className="flex-0 mr-6 ml-2">
-                    <img
-                      src={app.image_url}
-                      className="rounded-full block w-16 shadow-inner"
-                      alt="Author"
-                    />
-                  </div>
-                  <div className="flex-0 self-center ">
-                    <div className="leading-normal text-left">
-                      <p className="text-2xl text-black  ">
-                        <span className="text-3xl my-2 font-bold">
-                          {app.name}
-                        </span>{' '}
-                      </p>
-                      {!contentSpecific && (
-                        <p className="text-grey text-lg">{app.description}</p>
-                      )}
-                      {contentSpecific && (
-                        <div>
-                          <p className="uppercase tracking-wide text-grey-light text-sm font-bold inline mr-1">
-                            For
-                          </p>
-                          <a
-                            href={url}
-                            className=" text-pink no-underline border-b-2 border-pink-lighter"
-                          >
-                            {name}
-                          </a>
-                        </div>
-                      )}
+                  <div className="flex justify-center items-start w-full ">
+                    <div className="flex-0 mr-6 ml-2">
+                      <img
+                        src={app.image_url}
+                        className="rounded-full block w-16 shadow-inner"
+                        alt="Author"
+                      />
+                    </div>
+                    <div className="flex-0 self-center ">
+                      <div className="leading-normal text-left">
+                        <p className="text-2xl text-black  ">
+                          <span className="text-3xl my-2 font-bold">
+                            {app.name}
+                          </span>{' '}
+                        </p>
+                        {!contentSpecific && (
+                          <p className="text-grey text-lg">{app.description}</p>
+                        )}
+                        {contentSpecific && (
+                          <div>
+                            <p className="uppercase tracking-wide text-grey-light text-sm font-bold inline mr-1">
+                              For
+                            </p>
+                            <a
+                              href={url}
+                              className=" text-pink no-underline border-b-2 border-pink-lighter"
+                            >
+                              {name}
+                            </a>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </section>
+                </section>
 
-              <div className="">
-                <div>
-                  {authenticated ? (
-                    <AuthedForm payable={payable} app={app} price={price} />
-                  ) : (
-                    <UnauthedForm payable={payable} app={app} price={price} />
-                  )}
+                <div className="">
+                  <div>
+                    {authenticated ? (
+                      <AuthedForm payable={payable} app={app} price={price} />
+                    ) : (
+                      <UnauthedForm payable={payable} app={app} price={price} />
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </div>
   )
 }
 
-export default connect(state => ({ authenticated: state.auth.authenticated }))(
-  StaticPage
-)
+export default connect(
+  state => ({
+    authenticated: state.auth.authenticated,
+    balance: state.auth.balance,
+    token: state.auth.user.idToken,
+  }),
+  dispatch => ({
+    logout: dispatch.auth.logout,
+    setBalance: dispatch.auth.SET_BALANCE,
+  })
+)(StaticPage)

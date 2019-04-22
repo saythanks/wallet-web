@@ -5,7 +5,7 @@ const actionCodeSettings = () => ({
   // URL you want to redirect back to. The domain (www.example.com) for this
   // URL must be whitelisted in the Firebase Console.
   url: `${window.location.protocol}//${window.location.hostname}${
-    window.location.port === 80 ? '' : `:${window.location.port}`
+    !!window.location.port ? `:${window.location.port}` : ''
   }/auth/verify`,
   // This must be true.
   handleCodeInApp: true,

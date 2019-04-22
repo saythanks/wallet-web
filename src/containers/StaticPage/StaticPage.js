@@ -159,7 +159,7 @@ export default connect(
   state => ({
     authenticated: state.auth.authenticated,
     balance: state.auth.balance,
-    token: state.auth.user.idToken,
+    token: state.auth.user && state.auth.user.idToken,
   }),
   dispatch => ({
     logout: dispatch.auth.logout,

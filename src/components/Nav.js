@@ -4,7 +4,7 @@ import { ReactComponent as Logo } from '../containers/Home/LogoB.svg'
 import { formatCents } from '../util/currency'
 import { connect } from 'react-redux'
 
-const Nav = ({ logout, balance, showBalance = true }) => {
+const Nav = ({ logout, balance, showBalance = true, authenticated }) => {
   const handleLogout = e => {
     e.preventDefault()
     logout()
@@ -28,25 +28,39 @@ const Nav = ({ logout, balance, showBalance = true }) => {
           </Link>
         </div>
         <div className="flex items-center ">
-          {showBalance && (
-            <Link
-              to="/"
-              className="no-underline bg-grey-lightest px-3 py-2 rounded shadow border block hover:shadow-lg mr-4 text-black"
-            >
-              <span className="font-medium">{formatCents(balance)}</span>{' '}
-              balance
-            </Link>
+          {authenticated ? (
+            <>
+              {' '}
+              {showBalance && (
+                <Link
+                  to="/"
+                  className="no-underline bg-grey-lightest px-3 py-2 rounded shadow border block hover:shadow-lg mr-4 text-black"
+                >
+                  <span className="font-medium">{formatCents(balance)}</span>{' '}
+                  balance
+                </Link>
+              )}
+              <Link to="/settings" className={mainStyle}>
+                Settings
+              </Link>
+              <a href="#logout" className={logoutStyle} onClick={handleLogout}>
+                Sign out
+              </a>
+            </>
+          ) : (
+            <>
+              <Link to="/auth/login" className={logoutStyle}>
+                Log in
+              </Link>
+            </>
           )}
-          <Link to="/settings" className={mainStyle}>
-            Settings
-          </Link>
-          <a href="#logout" className={logoutStyle} onClick={handleLogout}>
-            Sign out
-          </a>
         </div>
       </nav>
     </section>
   )
 }
 
-export default connect(state => ({ balance: state.auth.balance }))(Nav)
+export default connect(state => ({
+  authenticated: state.auth.authenticated,
+  balance: state.auth.balance,
+}))(Nav)

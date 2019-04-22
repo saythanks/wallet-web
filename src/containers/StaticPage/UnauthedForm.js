@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import { ReactComponent as LogoWhite } from '../../img/logo_light.svg'
-import { Elements, CardElement } from 'react-stripe-elements'
+import { Elements, CardElement, injectStripe } from 'react-stripe-elements'
 import { Link, Redirect } from 'react-router-dom'
 import axios from 'axios'
 import config from '../../config'
 import { toast } from 'react-toastify'
 import { formatCents } from '../../util/currency'
+import { connect } from 'react-redux'
+import { red } from 'ansi-colors'
+import { SMS } from 'aws-sdk'
 
 const FormGroup = ({ children, title = '', className = '' } = {}) => (
   <label className={'mb-8 block w-full' + className}>
@@ -54,7 +57,76 @@ const FormText = ({
   </FormGroup>
 )
 
-const UnauthedForm = ({ payable, app, price }) => {
+const CardForm = injectStripe(
+  ({ price, name, setName, email, setEmail, setStep, stripe, setToken }) => {
+    const [cardError, setCardError] = useState('')
+    const [loading, setLoading] = useState(false)
+
+    const verifyCard = e => {
+      e.preventDefault()
+
+      console.log(name, email)
+
+      if (!name || !email) return toast.error('Please fill out all fields')
+      console.log('submitting')
+      setLoading(true)
+      stripe.createToken().then(({ token, error }) => {
+        if (error) setCardError(error.message)
+        else {
+          setToken(token.id)
+          setStep(1)
+        }
+
+        setLoading(false)
+      })
+    }
+
+    return (
+      <form onSubmit={verifyCard}>
+        <p className="text-center mb-6 text-grey-dark">
+          Already have an account?{' '}
+          <Link to="/login" className="text-pink">
+            Login
+          </Link>
+        </p>
+        <div className="mb-8">
+          <div className="flex justify-between flex-wrap sm:flex-no-wrap -mx-1">
+            <FormText
+              title="Name on Card"
+              className="flex-1 w-full mx-1 sm:w-1/2"
+              value={name}
+              onChange={setName}
+            />
+            <FormText
+              title="Email"
+              className="flex-1 w-full mx-1 sm:w-1/2"
+              value={email}
+              onChange={setEmail}
+            />
+          </div>
+          <CardElement className="px-3 py-3 border-2 border-grey-lightest focus:border-pink-lightest" />
+          {cardError && <p className="text-red text-sm">{cardError}</p>}
+        </div>
+
+        <button
+          type="submit"
+          className="w-full bg-pink-dark font-bold flex items-center justify-center tracking-wide text-white rounded-sm shadow-md px-6 py-3"
+        >
+          <LogoWhite width={20} className="mr-3" />
+          {!loading ? (
+            <p className="flex items-baseline uppercase tracking-wide font-medium">
+              Say Thanks for {formatCents(price)}
+            </p>
+          ) : (
+            'Loading...'
+          )}
+        </button>
+      </form>
+    )
+  }
+)
+
+const UnauthedForm = ({ payable, app, price = 50, requestLink }) => {
   const topups = [
     { name: '$5', value: '500' },
     { name: '$10', value: '1000' },
@@ -69,6 +141,7 @@ const UnauthedForm = ({ payable, app, price }) => {
   const [loading, setLoading] = useState(false)
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
+  const [token, setToken] = useState('')
 
   const pay = () => {
     if (!app) return
@@ -80,7 +153,7 @@ const UnauthedForm = ({ payable, app, price }) => {
         name: name,
         email: email,
         top_up: 500,
-        card_token: 'tok_visa',
+        card_token: token,
       })
       .then(() => {
         toast.success(`Tipped ${formatCents(price)}`)
@@ -99,6 +172,7 @@ const UnauthedForm = ({ payable, app, price }) => {
   useEffect(() => {
     if (step === 2) {
       // window.location = payable.permalink
+      requestLink(email)
     }
   }, [step])
 
@@ -108,41 +182,15 @@ const UnauthedForm = ({ payable, app, price }) => {
       <div className="p-6">
         {step === 0 && (
           <Elements>
-            <div>
-              <p className="text-center mb-6 text-grey-dark">
-                Already have an account?{' '}
-                <Link to="/login" className="text-pink">
-                  Login
-                </Link>
-              </p>
-              <form className="mb-8">
-                <div className="flex justify-between flex-wrap sm:flex-no-wrap -mx-1">
-                  <FormText
-                    title="Name on Card"
-                    className="flex-1 w-full mx-1 sm:w-1/2"
-                    value={name}
-                    onChange={setName}
-                  />
-                  <FormText
-                    title="Email"
-                    className="flex-1 w-full mx-1 sm:w-1/2"
-                    value={email}
-                    onChange={setEmail}
-                  />
-                </div>
-                <CardElement className="px-3 py-3 border-2 border-grey-lightest focus:border-pink-lightest" />
-              </form>
-
-              <button
-                onClick={() => setStep(1)}
-                className="w-full bg-pink-dark font-bold flex items-center justify-center tracking-wide text-white rounded-sm shadow-md px-6 py-3"
-              >
-                <LogoWhite width={20} className="mr-3" />
-                <p className="flex items-baseline uppercase tracking-wide font-medium">
-                  Say Thanks for {formatCents(price)}
-                </p>
-              </button>
-            </div>
+            <CardForm
+              price={price}
+              name={name}
+              setName={setName}
+              email={email}
+              setEmail={setEmail}
+              setStep={setStep}
+              setToken={setToken}
+            />
           </Elements>
         )}
 
@@ -199,8 +247,17 @@ const UnauthedForm = ({ payable, app, price }) => {
         )}
         {step === 2 && (
           <div>
-            Thanks for giving!{' '}
-            <Link to="/login">Login and verify your email to give more.</Link>
+            <h3 className="text-grey-darkest mb-2 text-2xl">
+              Thanks for giving!
+            </h3>
+
+            <p className="leading-normal text-grey-darkest text-lg">
+              To use the rest of your balance, click the link in the email we
+              just sent to verify your account or{' '}
+              <Link to="/login" className="text-teal-dark no-under">
+                login and keep giving.
+              </Link>
+            </p>
           </div>
         )}
       </div>
@@ -208,4 +265,7 @@ const UnauthedForm = ({ payable, app, price }) => {
   )
 }
 
-export default UnauthedForm
+export default connect(
+  () => ({}),
+  dispatch => ({ requestLink: dispatch.auth.requestEmailLogin })
+)(UnauthedForm)

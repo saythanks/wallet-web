@@ -6,7 +6,14 @@ import config from '../../config'
 import { toast } from 'react-toastify'
 import TipButton from '../../components/TipButton/TipButton'
 
-const AuthedForm = ({ payable, app, idToken, price, balance, setBalance }) => {
+const AuthedForm = ({
+  payable,
+  app,
+  idToken,
+  price = 50,
+  balance,
+  setBalance,
+}) => {
   const [loading, setLoading] = useState(false)
 
   const [initialTip, setInitalTip] = useState(0)

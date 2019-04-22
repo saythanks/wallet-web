@@ -28,7 +28,18 @@ export default {
 
       return axios
         .get(`${config.api.baseUrl}/me`)
-        .then(res => dispatch.SET(res.data))
+        .then(res => dispatch.user.SET(res.data))
+        .catch(console.error)
+    },
+
+    updateStripe({ cardToken, name }, rootState) {
+      axios.defaults.headers = {
+        Authorization: `Bearer ${rootState.auth.user.idToken}`,
+      }
+
+      return axios
+        .post(`${config.api.baseUrl}/me/billing`, { cardToken, name })
+        .then(res => dispatch.user.SET(res.data))
         .catch(console.error)
     },
 

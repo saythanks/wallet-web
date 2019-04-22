@@ -11,6 +11,7 @@ import queryString from 'query-string'
 import Spinner from '../../components/Spinner/Spinner'
 import Nav from '../../components/Nav'
 import Header from '../../components/Header'
+import Avatar from 'react-avatar'
 /**
  * This page is what you see when you click a static link to donate.
  * It needs to handle the following state:
@@ -103,11 +104,17 @@ const StaticPage = ({
 
                   <div className="flex justify-center items-start w-full ">
                     <div className="flex-0 mr-6 ml-2">
-                      <img
+                      <Avatar
+                        src={app.image_url}
+                        name={app.name}
+                        round
+                        size={65}
+                      />
+                      {/* <img
                         src={app.image_url}
                         className="rounded-full block w-16 shadow-inner"
                         alt="Author"
-                      />
+                      /> */}
                     </div>
                     <div className="flex-0 self-center ">
                       <div className="leading-normal text-left">

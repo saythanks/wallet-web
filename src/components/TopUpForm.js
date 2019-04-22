@@ -5,7 +5,7 @@ import config from '../config'
 import axios from 'axios'
 import { connect } from 'react-redux'
 
-const TopUpForm = injectStripe(({ idToken, stripe, setBalance }) => {
+const TopUpForm = injectStripe(({ idToken, stripe, setBalance, user }) => {
   const options = [5, 10, 15, 20]
   const [selected, setSelected] = useState(0)
 
@@ -18,6 +18,22 @@ const TopUpForm = injectStripe(({ idToken, stripe, setBalance }) => {
     if (step !== 1) return
 
     setLoading(true)
+
+    if (user.stripe_id) {
+      axios.defaults.headers = { Authorization: `Bearer ${idToken}` }
+      axios
+        .post(`${config.api.baseUrl}/balance`, {
+          amount: options[selected] * 100,
+        })
+        .then(res => res.data)
+        .then(data => setBalance(data.balance))
+        .catch(e => toast.error(e.message))
+        .finally(() => {
+          setLoading(false)
+          setStep(0)
+        })
+      return
+    }
 
     // Within the context of `Elements`, this call to createToken knows which Element to
     // tokenize, since there's only one in this group.
@@ -91,13 +107,21 @@ const TopUpForm = injectStripe(({ idToken, stripe, setBalance }) => {
             <i className="fas fa-arrow-left text-grey-light mr-1" /> Back
           </button>
           <div className="flex items-center justify-between">
-            <CardElement
-              className="flex-1"
-              onChange={({ error }) => {
-                if (error) setCardError(error.message)
-                else setCardError(null)
-              }}
-            />
+            {user.stripe_id ? (
+              <p>
+                <strong>{user.card_brand}</strong>{' '}
+                <span className="ml-2">•••• {user.last_4}</span>{' '}
+              </p>
+            ) : (
+              <CardElement
+                className="flex-1"
+                onChange={({ error }) => {
+                  if (error) setCardError(error.message)
+                  else setCardError(null)
+                }}
+              />
+            )}
+
             <button
               type="submit"
               disabled={!!cardError}
@@ -125,6 +149,7 @@ const TopUpForm = injectStripe(({ idToken, stripe, setBalance }) => {
 
 const mapState = state => ({
   idToken: state.auth.user.idToken,
+  user: state.user.me,
 })
 
 const mapDispatch = dispatch => ({

@@ -18,10 +18,10 @@ const Footer = () => (
         <Logo width={30} className="inline-block mr-4" /> SayThanks
       </Link>
       <div>
-        <FooterLink to="/">Terms of Use</FooterLink>
-        <FooterLink to="/">Privacy</FooterLink>
-        <FooterLink to="/">Help</FooterLink>
-        <FooterLink to="/">Contact</FooterLink>
+        
+      <a href="https://www.saythanks.me/privacy" className="no-underline text-grey text-sm mx-4">Privacy</a>
+        <a href="https://www.saythanks.me/terms" className="no-underline text-grey text-sm mx-4">Terms</a>
+        <a href="mailto:help@saythanks.me?subject=Help Request for SayThanks" className="no-underline text-grey text-sm mx-4">Help</a>
       </div>
     </section>
   </footer>

@@ -40,9 +40,11 @@ const Auth = ({ login, error, loading, match }) => {
   }
 
   return (
-    <div className="container mx-auto flex items-center justify-center h-full">
-      <Route path={`${match.path}/login`} component={Login} />
-      <Route path={`${match.path}/verify`} component={VerifyEmail} />
+    <div className="bg-pr-4 min-h-full flex-1 flex items-center justify-center">
+      <div className="container mx-auto flex items-center justify-center h-full">
+        <Route path={`${match.path}/login`} component={Login} />
+        <Route path={`${match.path}/verify`} component={VerifyEmail} />
+      </div>
     </div>
   )
 }

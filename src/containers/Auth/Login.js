@@ -34,30 +34,33 @@ const Login = ({ requestEmailLogin }) => {
 
   return (
     <div className="container mx-auto h-full flex items-center justify-center">
-      <div className="flex-1 max-w-sm mx-auto bg-white m-6 rounded-sm overflow-hidden shadow-lg">
-        <div className="w-full h-1 bg-pink" />
+      <div className="flex-1 max-w-xs mx-auto bg-white m-6 rounded-sm overflow-hidden shadow-lg">
+        {/* <div className="w-full h-1 bg-pink" /> */}
 
-        <div className="p-6">
-          <h1 className="text-grey-dark uppercase tracking-wide text-base pb-3 mb-5 border-b border-grey-lighter">
-            Sign in
-          </h1>
+        <div className="">
+          <div className="p-6">
+            <h1 className="text-grey-dark uppercase tracking-wide text-base pb-3 border-b border-grey-lighter">
+              Sign in to Say Thanks
+            </h1>
+          </div>
           {!submitted ? (
             <form onSubmit={handleSubmit} className="clearfix">
-              <Input title="Email" value={email} onChange={setEmail} />
-
-              <button className="bg-pink px-4 py-2 text-white rounded-sm float-right shadow-lg block font-bold">
+              <div className="p-6 pt-0">
+                <Input title="Email" value={email} onChange={setEmail} />
+              </div>
+              <button className="bg-pn-4 px-4 py-2 text-pn-1 uppercase focus:outline-none  rounded-b-sm w-full shadow-lg block font-bold">
                 Sign in
               </button>
             </form>
           ) : (
-            <div>
+            <div className="p-6 pt-0">
               <p className="text-grey mb-2">
                 A sign-in link has been sent to your email.
               </p>
               <p>
                 <a
                   href="#tryAgain"
-                  className="text-pink no-underline pb-1 text-sm"
+                  className="text-tl-4 no-underline pb-1 text-sm"
                   onClick={e => {
                     e.preventDefault()
                     setSubmitted(false)

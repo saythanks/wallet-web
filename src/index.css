@@ -24,13 +24,22 @@ html,
 body,
 #root {
   height: 100%;
+  min-height: 100%;
   @apply font-sans;
-  @apply bg-grey-lightest;
+  @apply bg-white;
 }
 
 input {
   appearance: none;
 }
+
+.input-text::placeholder {
+  color: config(colors.gr-2);
+  opacity: 1;
+  font-size: 0.9em;
+  font-weight: 500;
+}
+
 /**
  * Here you would add any of your custom component classes; stuff that you'd
  * want loaded *before* the utilities so that the utilities could still

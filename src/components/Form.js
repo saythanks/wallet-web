@@ -16,10 +16,15 @@ export const FormGroup = ({ className, title, error, children }) => (
   </div>
 )
 
+// export const textInputStyle = error =>
+//   'shadow appearance-none border rounded w-full py-2 px-3 ' +
+//   'text-grey-500 leading-tight focus:outline-none focus:shadow-outline ' +
+//   (error ? 'border-red-400' : 'border-grey-200')
+
 export const textInputStyle = error =>
-  'shadow appearance-none border rounded w-full py-2 px-3 ' +
-  'text-grey-500 leading-tight focus:outline-none focus:shadow-outline ' +
-  (error ? 'border-red-400' : 'border-grey-200')
+  ' appearance-none border rounded-sm w-full py-2 px-3 ' +
+  'text-gr-5 bg-gr-0 leading-tight focus:outline-none focus:shadow-outline ' +
+  (error ? 'border-red-400' : 'border-white')
 
 export const TextArea = ({
   className,

@@ -1,17 +1,28 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { ReactComponent as Logo } from '../containers/Home/LogoB.svg'
+import { ReactComponent as Logo } from '../img/logo_light.svg'
+import { ReactComponent as LogoB } from '../containers/Home/LogoB.svg'
 import { formatCents } from '../util/currency'
 import { connect } from 'react-redux'
 
-const Nav = ({ logout, balance, showBalance = true }) => {
+const Nav = ({
+  logout,
+  balance,
+  showBalance = true,
+  authenticated,
+  dark = false,
+}) => {
   const handleLogout = e => {
     e.preventDefault()
     logout()
   }
 
   const linkStyle =
-    'no-underline p-2 rounded-sm text-grey-dark hover:bg-grey-lightest'
+    'no-underline p-2 rounded-sm ' +
+    (dark
+      ? 'text-pn-1 hover:bg-pr-5'
+      : 'text-grey-dark hover:bg-grey-lightest ')
+
   const mainStyle = `${linkStyle} font-semibold`
 
   const logoutStyle = `${linkStyle} font-normal`
@@ -22,31 +33,54 @@ const Nav = ({ logout, balance, showBalance = true }) => {
         <div className="flex items-center">
           <Link
             to="/"
-            className={`${linkStyle} text-pink font-black flex items-center hover:bg-white`}
+            className={`${linkStyle} text-pn-1 font-black flex items-center`}
           >
-            <Logo width={30} className="inline-block mr-4" /> SayThanks
+            {dark ? (
+              <Logo width={30} className="inline-block mr-4" />
+            ) : (
+              <LogoB width={30} className="inline-block mr-4" />
+            )}{' '}
+            SayThanks
           </Link>
         </div>
         <div className="flex items-center ">
-          {showBalance && (
-            <Link
-              to="/"
-              className="no-underline bg-grey-lightest px-3 py-2 rounded shadow border block hover:shadow-lg mr-4 text-black"
-            >
-              <span className="font-medium">{formatCents(balance)}</span>{' '}
-              balance
-            </Link>
+          {authenticated ? (
+            <>
+              {showBalance && (
+                <Link
+                  to="/"
+                  className={
+                    'no-underline px-3 py-2 rounded  block mr-4 ' +
+                    (dark
+                      ? 'shadow-inner bg-pr-5 text-pn-1 '
+                      : 'shadow border bg-grey-lightest hover:shadow-lg  text-black')
+                  }
+                >
+                  <span className="font-medium">{formatCents(balance)}</span>{' '}
+                  balance
+                </Link>
+              )}
+              <Link to="/settings" className={mainStyle}>
+                Settings
+              </Link>
+              <a href="#logout" className={logoutStyle} onClick={handleLogout}>
+                Sign out
+              </a>
+            </>
+          ) : (
+            <>
+              <Link to="/auth/login" className={logoutStyle}>
+                Log in
+              </Link>
+            </>
           )}
-          <Link to="/settings" className={mainStyle}>
-            Settings
-          </Link>
-          <a href="#logout" className={logoutStyle} onClick={handleLogout}>
-            Sign out
-          </a>
         </div>
       </nav>
     </section>
   )
 }
 
-export default connect(state => ({ balance: state.auth.balance }))(Nav)
+export default connect(state => ({
+  authenticated: state.auth.authenticated,
+  balance: state.auth.balance,
+}))(Nav)

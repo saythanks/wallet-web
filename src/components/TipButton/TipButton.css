@@ -1,4 +1,4 @@
-.tip-button {
+/* .tip-button {
   position: relative;
   outline: 1px solid transparent;
   @apply border border-pink;
@@ -71,4 +71,4 @@
     box-shadow: 0 0 50px config(colors.pink-dark),
       inset 0 0 10px config(colors.pink);
   }
-}
+} */

@@ -132,6 +132,7 @@ const TipButton = ({
 
   const handleClick = () => {
     // timeline.replay()
+    if (disabled || loading) return
     setLoading(true)
     onPay(price, 1)
       .catch(console.error)
@@ -156,6 +157,7 @@ const TipButton = ({
       className="flex-items-center bg-pn-4 text-pn-1 font-bold block px-2 py-3 w-full text-lg focus:outline-none"
       style={{ touchAction: 'manipulation' }}
       onClick={handleClick}
+      disabled={loading}
     >
       {loading ? (
         <Spinner />

@@ -1,6 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { ReactComponent as Logo } from '../img/logo_light.svg'
+import { ReactComponent as LogoB } from '../containers/Home/LogoB.svg'
 import { formatCents } from '../util/currency'
 import { connect } from 'react-redux'
 
@@ -34,17 +35,26 @@ const Nav = ({
             to="/"
             className={`${linkStyle} text-pn-1 font-black flex items-center`}
           >
-            <Logo width={30} className="inline-block mr-4" /> SayThanks
+            {dark ? (
+              <Logo width={30} className="inline-block mr-4" />
+            ) : (
+              <LogoB width={30} className="inline-block mr-4" />
+            )}{' '}
+            SayThanks
           </Link>
         </div>
         <div className="flex items-center ">
           {authenticated ? (
             <>
-              {' '}
               {showBalance && (
                 <Link
                   to="/"
-                  className="no-underline bg-grey-lightest px-3 py-2 rounded shadow border block hover:shadow-lg mr-4 text-black"
+                  className={
+                    'no-underline px-3 py-2 rounded  block mr-4 ' +
+                    (dark
+                      ? 'shadow-inner bg-pr-5 text-pn-1 '
+                      : 'shadow border bg-grey-lightest hover:shadow-lg  text-black')
+                  }
                 >
                   <span className="font-medium">{formatCents(balance)}</span>{' '}
                   balance

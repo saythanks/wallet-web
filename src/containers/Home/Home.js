@@ -80,7 +80,7 @@ const Balance = ({ token, balance }) => {
 }
 
 const Item = ({ item }) => (
-  <div className="flex rounded-sm mb-4 relative">
+  <div className="flex rounded-sm mb-0 relative">
     <div
       className="absolute border-2 border-pink-lightest bg-pink rounded-full pin-t pin-l"
       style={{ width: '10px', height: '10px', transform: 'translateX(-30%)' }}
@@ -103,11 +103,20 @@ const Item = ({ item }) => (
 )
 
 const Purchases = ({ loading, transactions, setPage, page }) => (
-  <section className=" max-w-sm mx-auto mt-24 mb-24">
+  <section className=" max-w-xs mx-auto mt-24 mb-24">
+    <h1 className="text-2xl text-grey-darkest mb-8">My Tips</h1>
     {loading ? (
       <Spinner />
     ) : !transactions ? (
       <div>Could not load transactions</div>
+    ) : transactions.items.length === 0 ? (
+      <>
+        <p className="text-black text-lg leading-normal">
+          You haven't given to any creators yet! Click the{' '}
+          <strong>SayThanks</strong> button on any website that has it and give
+          to see your tips show up here.
+        </p>
+      </>
     ) : (
       <>
         <div className="relative">
@@ -119,20 +128,25 @@ const Purchases = ({ loading, transactions, setPage, page }) => (
           </div>
         </div>
         <div className="text-center">
-          <button
-            onClick={() => setPage(Math.max(page - 1, 1))}
-            className="font-semibold mr-2 text-grey-dark border-b border-grey-light focus:outline-none hover:text-grey-darker"
-          >
-            Prev
-          </button>
-          <button
-            onClick={() => {
-              if (transactions.has_next) setPage(page + 1)
-            }}
-            className="font-semibold text-grey-dark border-b border-grey-light focus:outline-none hover:text-grey-darker"
-          >
-            Next
-          </button>
+          {transactions.has_prev && (
+            <button
+              onClick={() => setPage(Math.max(page - 1, 1))}
+              className="font-semibold mr-2 text-grey-dark border-b border-grey-light focus:outline-none hover:text-grey-darker"
+            >
+              Prev
+            </button>
+          )}
+
+          {transactions.has_next && (
+            <button
+              onClick={() => {
+                if (transactions.has_next) setPage(page + 1)
+              }}
+              className="font-semibold text-grey-dark border-b border-grey-light focus:outline-none hover:text-grey-darker"
+            >
+              Next
+            </button>
+          )}
         </div>
       </>
     )}

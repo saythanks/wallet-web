@@ -26,7 +26,7 @@ body,
   height: 100%;
   min-height: 100%;
   @apply font-sans;
-  @apply bg-grey-lightest;
+  @apply bg-white;
 }
 
 input {
@@ -37,6 +37,7 @@ input {
   color: config(colors.gr-2);
   opacity: 1;
   font-size: 0.9em;
+  font-weight: 500;
 }
 
 /**

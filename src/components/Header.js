@@ -14,7 +14,7 @@ const Header = ({
     className={
       'pt-0 text-center ' +
       (!withCashForm && 'pb-6 ') +
-      (dark ? 'bg-pr-4 text-white' : 'bg-white border-b border-grey-lighter')
+      (dark ? ' bg-pr-4 text-white' : ' bg-white border-b border-grey-lighter')
     }
   >
     {!dark ? (
@@ -23,7 +23,7 @@ const Header = ({
       <div className="w-full mb-6" />
     )}
     <div className="container mx-auto">
-      <Nav logout={logout} showBalance={showBalance} dark />
+      <Nav logout={logout} showBalance={showBalance} dark={dark} />
       <div className="max-w-sm mx-auto">{children}</div>
     </div>
     {withCashForm && (

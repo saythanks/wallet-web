@@ -12,6 +12,8 @@ import Spinner from '../../components/Spinner/Spinner'
 import Nav from '../../components/Nav'
 import Header from '../../components/Header'
 import Avatar from 'react-avatar'
+import { hostname } from '../../util/url'
+import Footer from '../../components/Footer'
 /**
  * This page is what you see when you click a static link to donate.
  * It needs to handle the following state:
@@ -46,6 +48,7 @@ const StaticPage = ({
   const [loading, setLoading] = useState(true)
   const [payable, setPayable] = useState(null)
   const [app, setApp] = useState(null)
+  const [shouldHideInfo, setShouldHideInfo] = useState(false)
 
   useEffect(() => {
     axios
@@ -73,83 +76,87 @@ const StaticPage = ({
   if (!loading && !app) return <div>Not found</div>
 
   return (
-    <div className="">
-      <Header withCashForm={false} logout={logout} balance={balance} />
+    <div className="bg-pr-4 h-full flex-1 font-system antialiased">
+      <Header withCashForm={false} logout={logout} balance={balance} dark />
       <div className="container mx-auto min-h-full pt-16 pb-12">
-        <div className="max-w-sm mx-auto mb-12 h-full flex-1">
-          <div className="w-full text-center z-0 opacity-50">
-            <Logo
-              width={70}
-              className="inline-block"
-              style={{ marginBottom: -5 }}
-            />
-          </div>
-          <div className="wrap px-6 bg-white shadow-md rounded border border-grey-200 ">
+        <div className="max-w-xs mx-auto mb-12 h-full flex-1">
+          <div className="wrap bg-white shadow-md rounded-sm ">
             {loading ? (
               <div className="w-full h-32 flex items-center justify-center pr-4">
                 <Spinner />
               </div>
             ) : (
-              <div>
-                <div className="flex justify-center w-full mb-6">
-                  <Link
-                    to="/"
-                    className="text-pink font-black inline-block mb-0"
-                  />
-                </div>
-                <section>
-                  <p className="uppercase text-xl font-bold tracking-wide text-grey-dark mb-6 text-center">
-                    Say thanks <span className="text-grey">to</span>
-                  </p>
-
-                  <div className="flex justify-center items-start w-full ">
-                    <div className="flex-0 mr-6 ml-2">
+              <div className="flex flex-col items-center justify-start text-center">
+                <div className="px-6">
+                  <div
+                    className="rounded-full border-white inline-block mx-auto"
+                    style={{
+                      transform: 'translateY(-50%)',
+                      borderWidth: '3px',
+                    }}
+                  >
+                    <div>
                       <Avatar
                         src={app.image_url}
                         name={app.name}
                         round
-                        size={65}
+                        size={100}
                       />
-                      {/* <img
-                        src={app.image_url}
-                        className="rounded-full block w-16 shadow-inner"
-                        alt="Author"
-                      /> */}
-                    </div>
-                    <div className="flex-0 self-center ">
-                      <div className="leading-normal text-left">
-                        <p className="text-2xl text-black  ">
-                          <span className="text-3xl my-2 font-bold">
-                            {app.name}
-                          </span>{' '}
-                        </p>
-                        {!contentSpecific && (
-                          <p className="text-grey text-lg">{app.description}</p>
-                        )}
-                        {contentSpecific && (
-                          <div>
-                            <p className="uppercase tracking-wide text-grey-light text-sm font-bold inline mr-1">
-                              For
-                            </p>
-                            <a
-                              href={url}
-                              className=" text-pink no-underline border-b-2 border-pink-lighter"
-                            >
-                              {name}
-                            </a>
-                          </div>
-                        )}
-                      </div>
                     </div>
                   </div>
-                </section>
+                  <section className="-mt-6">
+                    <p className="text-gr-5 text-xl font-bold mb-1">
+                      {app.name}
+                    </p>
+                    <a
+                      href={app.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="no-underline text-gr-3 text-sm font-semibold mb-4 block"
+                    >
+                      {hostname(app.url)}
+                    </a>
+                    {!shouldHideInfo && (
+                      <>
+                        <p className="text-gr-3 text-sm leading-normal">
+                          {app.description}
+                        </p>
 
-                <div className="">
+                        <div className="leading-normal">
+                          {contentSpecific && (
+                            <div className="mt-10 mb-4">
+                              <p className="uppercase tracking-wide text-gr-4 text-xs  font-bold block mr-1">
+                                Say Thanks For
+                              </p>
+                              <a
+                                href={url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-gr-5 mt-1 bg-gr-0 py-1 px-2 w-full block text-left text-sm no-underline rounded-sm border border-gr-1"
+                              >
+                                <div className="mb-px font-medium">{name}</div>
+                                <span className="text-xs text-gr-3 -mt-1 block">
+                                  {hostname(url)}
+                                </span>
+                              </a>
+                            </div>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </section>
+                </div>
+                <div className="w-full rounded-b-sm overflow-hidden">
                   <div>
                     {authenticated ? (
                       <AuthedForm payable={payable} app={app} price={price} />
                     ) : (
-                      <UnauthedForm payable={payable} app={app} price={price} />
+                      <UnauthedForm
+                        payable={payable}
+                        app={app}
+                        price={price}
+                        setShouldHideInfo={setShouldHideInfo}
+                      />
                     )}
                   </div>
                 </div>

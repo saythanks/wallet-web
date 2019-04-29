@@ -32,6 +32,13 @@ body,
 input {
   appearance: none;
 }
+
+.input-text::placeholder {
+  color: config(colors.gr-2);
+  opacity: 1;
+  font-size: 0.9em;
+}
+
 /**
  * Here you would add any of your custom component classes; stuff that you'd
  * want loaded *before* the utilities so that the utilities could still

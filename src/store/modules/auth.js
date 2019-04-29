@@ -42,7 +42,7 @@ export default {
         if (!user) dispatch.auth.CLEAR_AUTH()
         else {
           user
-            .getIdToken()
+            .getIdToken(true)
             .then(idToken => {
               SessionAPI.create(idToken)
               dispatch.auth.SET_USER({

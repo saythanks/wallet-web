@@ -15,6 +15,7 @@ const AuthedForm = ({
   setBalance,
 }) => {
   const [loading, setLoading] = useState(false)
+  const [paid, setPaid] = useState(0)
 
   const [initialTip, setInitalTip] = useState(0)
 
@@ -43,6 +44,7 @@ const AuthedForm = ({
         console.log(`Tipped ${price * count}`)
         console.log(res)
         setBalance(res.data.balance)
+        setPaid(paid + price * count)
         return Promise.resolve({
           success: true,
           data: res.data,
@@ -68,16 +70,22 @@ const AuthedForm = ({
   }
 
   return (
-    <div className="mt-8" style={{ transform: 'translateY(50%)' }}>
-      <section className="flex justify-center">
-        <TipButton
-          onIndividualClick={() => handleBalanceUpdate(price)}
-          disabled={balance < price}
-          price={price}
-          onPay={pay}
-          baseline={initialTip}
-        />
-      </section>
+    <div className="mt-8 w-full block">
+      {paid > 0 && (
+        <>
+          <p className="text-gr-4 text-sm font-medium mb-1">
+            {formatCents(paid)} given
+          </p>
+          <p className="text-gr-3 text-sm mb-3">Keep clicking to give more</p>
+        </>
+      )}
+      <TipButton
+        onIndividualClick={() => handleBalanceUpdate(price)}
+        disabled={balance < price}
+        price={price}
+        onPay={pay}
+        baseline={initialTip}
+      />
     </div>
   )
 }

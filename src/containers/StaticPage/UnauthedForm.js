@@ -99,7 +99,18 @@ const CardForm = injectStripe(
               value={name}
               onChange={setName}
             />
-            <CardElement className="px-3 py-2 border-2 border-white rounded-sm bg-gr-0 " />
+            <CardElement
+              className="px-3 py-2 border-2 border-white rounded-sm bg-gr-0 font-system antialiased"
+              style={{
+                base: {
+                  color: '#4B3947',
+                  '::placeholder': {
+                    color: '#CBB3C6',
+                    fontWeight: 400,
+                  },
+                },
+              }}
+            />
             {cardError && <p className="text-red text-sm">{cardError}</p>}
           </div>
         </div>
@@ -139,7 +150,7 @@ const UnauthedForm = ({
 
   const [topup, setTopup] = useState(0)
 
-  const [step, setStep] = useState(2)
+  const [step, setStep] = useState(0)
 
   const [loading, setLoading] = useState(false)
   const [name, setName] = useState('')
@@ -245,11 +256,11 @@ const UnauthedForm = ({
                     onChange={setEmail}
                     className="flex-1 w-full"
                   />
-                  <FormText
+                  {/* <FormText
                     placeholder="Password"
                     type="password"
                     className="flex-1 w-full"
-                  />
+                  /> */}
                 </div>
               </form>
             </div>

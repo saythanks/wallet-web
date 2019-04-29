@@ -5,6 +5,9 @@ import axios from 'axios'
 import config from '../../config'
 import { toast } from 'react-toastify'
 import TipButton from '../../components/TipButton/TipButton'
+import Modal from 'react-modal'
+import TopUpForm from '../../components/TopUpForm'
+import { Elements } from 'react-stripe-elements'
 
 const AuthedForm = ({
   payable,
@@ -16,6 +19,7 @@ const AuthedForm = ({
 }) => {
   const [loading, setLoading] = useState(false)
   const [paid, setPaid] = useState(0)
+  const [modal, setModal] = useState(false)
 
   const [initialTip, setInitalTip] = useState(0)
 
@@ -71,6 +75,33 @@ const AuthedForm = ({
 
   return (
     <div className="mt-8 w-full block">
+      <Modal
+        isOpen={modal}
+        onRequestClose={() => setModal(false)}
+        className="flex h-full w-full items-center justify-center focus:outline-none"
+        style={{
+          overlay: {
+            backgroundColor: 'rgba(0,0,0,.4)',
+          },
+        }}
+      >
+        <div className="wrap bg-white p-6 rounded-sm shadow">
+          <h2 className="uppercase text-lg mb-4 text-grey-darker">
+            Add Money to your Account
+          </h2>
+          <Elements>
+            <TopUpForm onSuccess={() => setModal(false)} />
+          </Elements>
+          <div className="text-center">
+            <button
+              onClick={() => setModal(false)}
+              className="mt-4 text-grey-dark font-medium focus:outline-none"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </Modal>
       {paid > 0 && (
         <>
           <p className="text-gr-4 text-sm font-medium mb-1">
@@ -79,11 +110,13 @@ const AuthedForm = ({
           <p className="text-gr-3 text-sm mb-3">Keep clicking to give more</p>
         </>
       )}
+
       <TipButton
         onIndividualClick={() => handleBalanceUpdate(price)}
         disabled={balance < price}
         price={price}
         onPay={pay}
+        openTopUpForm={() => setModal(true)}
         baseline={initialTip}
       />
     </div>

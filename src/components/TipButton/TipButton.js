@@ -12,6 +12,7 @@ const TipButton = ({
   baseline = 0,
   onIndividualClick = () => null,
   disabled,
+  openTopUpForm = () => null,
 }) => {
   const [count, setCount] = useState(0)
   const [delta, setDelta] = useState(0)
@@ -144,12 +145,12 @@ const TipButton = ({
 
   if (disabled)
     return (
-      <Link
-        to="/"
+      <button
         className="flex-items-center bg-pn-4 text-pn-1 font-bold block px-2 py-3 w-full text-lg focus:outline-none no-underline block"
+        onClick={openTopUpForm}
       >
         Add Funds to Account
-      </Link>
+      </button>
     )
 
   return (

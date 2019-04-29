@@ -6,7 +6,10 @@ export default {
     IDENTITY_POOL_ID: 'YOUR_IDENTITY_POOL_ID',
   },
   stripe: {
-    apiKey: 'pk_test_Aa9HCt6t96ix37gxvpeqOKYL',
+    apiKey:
+      process.env.NODE_ENV === 'production'
+        ? 'pk_live_3jLMLDZZo9MhvOMvWl6U7tnJ'
+        : 'pk_test_Aa9HCt6t96ix37gxvpeqOKYL',
   },
   api: {
     baseUrl:

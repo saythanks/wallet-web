@@ -42,7 +42,7 @@ const TopUpForm = injectStripe(({ idToken, stripe, setBalance, user }) => {
       axios.defaults.headers = { Authorization: `Bearer ${idToken}` }
       axios
         .post(`${config.api.baseUrl}/balance`, {
-          token: 'tok_visa',
+          token: token.id,
           amount: options[selected] * 100,
         })
         .then(res => res.data)

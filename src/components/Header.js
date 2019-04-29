@@ -8,16 +8,22 @@ const Header = ({
   children,
   withCashForm = true,
   showBalance = true,
+  dark = false,
 } = {}) => (
   <section
     className={
-      'pt-0 text-center bg-white border-b border-grey-lighter ' +
-      (!withCashForm && 'pb-6')
+      'pt-0 text-center ' +
+      (!withCashForm && 'pb-6 ') +
+      (dark ? 'bg-pr-4 text-white' : 'bg-white border-b border-grey-lighter')
     }
   >
-    <div className="w-full h-1 bg-pink p-0 block mb-6" />
+    {!dark ? (
+      <div className="w-full h-1 bg-pink p-0 block mb-6" />
+    ) : (
+      <div className="w-full mb-6" />
+    )}
     <div className="container mx-auto">
-      <Nav logout={logout} showBalance={showBalance} />
+      <Nav logout={logout} showBalance={showBalance} dark />
       <div className="max-w-sm mx-auto">{children}</div>
     </div>
     {withCashForm && (

@@ -45,6 +45,25 @@ let defaultConfig = require('tailwindcss/defaultConfig')()
 let colors = {
   transparent: 'transparent',
 
+  'gr-0': '#F2EDF2',
+  'gr-1': '#DBCDD7',
+
+  'gr-2': '#CBB3C6',
+  'gr-3': '#B8A3B3',
+  // 'gr-3': '#938590',
+  'gr-4': '#938590',
+  'gr-5': '#4B3947',
+
+  'pr-4': '#52437F',
+  'pr-5': '#3C3456',
+
+  'pn-1': '#FFF5FD',
+  'pn-2': '#F5E0F0',
+  'pn-4': '#ED5ECC',
+  'pn-5': '#A2448C',
+
+  'tl-4': '#6EA3CF',
+
   black: '#1F2933',
   'grey-darkest': '#3E4C59',
   'grey-darker': '#52606D',
@@ -193,6 +212,20 @@ module.exports = {
     sans: [
       'brandon-grotesque',
       'Brandon Grotesque',
+      'system-ui',
+      'BlinkMacSystemFont',
+      '-apple-system',
+      'Segoe UI',
+      'Roboto',
+      'Oxygen',
+      'Ubuntu',
+      'Cantarell',
+      'Fira Sans',
+      'Droid Sans',
+      'Helvetica Neue',
+      'sans-serif',
+    ],
+    system: [
       'system-ui',
       'BlinkMacSystemFont',
       '-apple-system',
@@ -594,7 +627,7 @@ module.exports = {
   */
 
   maxWidth: {
-    xs: '20rem',
+    xs: '22rem',
     sm: '30rem',
     md: '40rem',
     lg: '50rem',

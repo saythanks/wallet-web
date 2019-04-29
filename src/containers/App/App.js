@@ -54,7 +54,7 @@ const ConnectedMeat = compose(
 const persistor = getPersistor()
 const App = () => {
   return (
-    <div className="min-h-full bg-grey-lightest">
+    <div className="min-h-full bg-grey-lightest flex flex-col">
       <StripeProvider apiKey={config.stripe.apiKey}>
         <PersistGate persistor={persistor}>
           <Provider store={store}>

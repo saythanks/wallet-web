@@ -1,17 +1,27 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { ReactComponent as Logo } from '../containers/Home/LogoB.svg'
+import { ReactComponent as Logo } from '../img/logo_light.svg'
 import { formatCents } from '../util/currency'
 import { connect } from 'react-redux'
 
-const Nav = ({ logout, balance, showBalance = true, authenticated }) => {
+const Nav = ({
+  logout,
+  balance,
+  showBalance = true,
+  authenticated,
+  dark = false,
+}) => {
   const handleLogout = e => {
     e.preventDefault()
     logout()
   }
 
   const linkStyle =
-    'no-underline p-2 rounded-sm text-grey-dark hover:bg-grey-lightest'
+    'no-underline p-2 rounded-sm ' +
+    (dark
+      ? 'text-pn-1 hover:bg-pr-5'
+      : 'text-grey-dark hover:bg-grey-lightest ')
+
   const mainStyle = `${linkStyle} font-semibold`
 
   const logoutStyle = `${linkStyle} font-normal`
@@ -22,7 +32,7 @@ const Nav = ({ logout, balance, showBalance = true, authenticated }) => {
         <div className="flex items-center">
           <Link
             to="/"
-            className={`${linkStyle} text-pink font-black flex items-center hover:bg-white`}
+            className={`${linkStyle} text-pn-1 font-black flex items-center`}
           >
             <Logo width={30} className="inline-block mr-4" /> SayThanks
           </Link>
